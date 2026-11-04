@@ -1,6 +1,10 @@
 // VEXOcar · landing page: menu sólido ao rolar, revelar seções, velocímetros, contador e paralaxe.
 (function () {
   document.documentElement.classList.add('js');
+
+  // Quem volta da demonstração ("Voltar ao início") sai dela: Entrar e Criar conta voltam a ser de verdade.
+  // Abrindo do computador (file://) o app é sempre demonstração, então não muda nada.
+  try { if (localStorage.getItem('vx:modo') === '"demo"') localStorage.removeItem('vx:modo'); } catch (e) {}
   const calmo = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Menu fica sólido depois do topo
