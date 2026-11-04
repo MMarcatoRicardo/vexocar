@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Histórico em PDF · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  @media (min-width: 960px) { .pdf-layout { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); } }
+  /* A folha (papel): fundo branco, texto escuro */
+  .folha { background: #fff; color: #1A1C20; border-radius: 6px; padding: 32px 28px; box-shadow: 0 20px 60px rgba(0, 0, 0, .5); font-size: 13px; line-height: 1.45; }
+  .folha .f-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding-bottom: 16px; border-bottom: 2px solid #0E0F11; }
+  .folha .wm-escuro { font-family: var(--titulo); font-size: 22px; display: inline-flex; align-items: baseline; color: #0E0F11; }
+  .folha .wm-escuro svg { width: .724em; height: .71em; margin-right: .03em; }
+  .folha .wm-escuro span { color: #13914E; }
+  .folha .doc-t { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #5D6169; font-weight: 600; text-align: right; }
+  .folha h2 { font-size: 22px; font-weight: 700; margin-top: 18px; }
+  .folha .f-sub { color: #5D6169; }
+  .folha .f-resumo { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; margin: 18px 0; padding: 14px 16px; border: 1px solid #DCDCD6; border-radius: 10px; }
+  .folha .gauge .g-fundo { stroke: #E6E6E1; }
+  .folha .gauge b { color: #0E0F11; }
+  .folha .f-num { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .folha .f-num strong { display: block; font-size: 16px; font-variant-numeric: tabular-nums; }
+  .folha .f-num span { font-size: 11px; color: #5D6169; }
+  .folha h3 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #5D6169; margin: 18px 0 8px; }
+  .folha table { width: 100%; border-collapse: collapse; }
+  .folha td, .folha th { text-align: left; padding: 7px 6px; border-bottom: 1px solid #ECECE7; vertical-align: top; }
+  .folha th { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #8A8F98; font-weight: 600; }
+  .folha td.v, .folha th.v { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .folha td small { display: block; color: #6B6F76; font-size: 11px; }
+  .folha .ok { color: #13914E; font-weight: 600; }
+  .folha .doc { color: #A86A0B; font-weight: 600; }
+  .folha tfoot td { font-weight: 700; border-bottom: 0; padding-top: 10px; }
+  .folha .f-rodape { display: flex; gap: 16px; align-items: center; margin-top: 22px; padding-top: 16px; border-top: 1px solid #DCDCD6; }
+  .folha .qr { width: 96px; height: 96px; flex: none; display: grid; place-items: center; }
+  .folha .qr img, .folha .qr canvas { width: 96px !important; height: 96px !important; }
+  .folha .qr-sem { border: 1px dashed #8A8F98; font-size: 9px; padding: 6px; word-break: break-all; text-align: center; }
+  .folha .f-rodape p { color: #5D6169; font-size: 11px; }
+  .opcoes .linha-op { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--linha); }
+  .opcoes .linha-op:last-child { border-bottom: 0; }
+  @media (max-width: 520px) {
+    .folha { padding: 20px 14px; font-size: 12px; }
+    .folha .col-of, .folha .col-km { display: none; }
+    .folha td, .folha th { padding: 6px 4px; }
+    .folha .f-resumo { grid-template-columns: 1fr; justify-items: start; }
+    .folha .f-topo { flex-direction: column; } .folha .doc-t { text-align: left; }
+  }
+  @media print {
+    @page { size: A4; margin: 14mm; }
+    body { background: #fff !important; }
+    .shell .conteudo > *:not(.pdf-layout), .pdf-layout > aside { display: none !important; }
+    .pdf-layout { display: block !important; }
+    .folha { box-shadow: none; padding: 0; border-radius: 0; }
+    .folha .col-of, .folha .col-km { display: table-cell !important; }
+  }
+</style>
+</head>
+<!-- Tela 08: Histórico em PDF. Documento de revenda com dados do carro, manutenções e QR code de verificação. -->
+<body class="shell">
+<main class="conteudo entra">
+  <header class="topo">
+    <a class="voltar" id="voltar" href="garagem.html" aria-label="Voltar" data-icone="voltar"></a>
+    <h1>Histórico em PDF</h1>
+  </header>
+
+  <div class="duas-col pdf-layout">
+    <section><article class="folha" id="folha" aria-label="Prévia do documento"></article></section>
+
+    <aside class="fixo">
+      <div class="cartao opcoes">
+        <span class="rotulo">Incluir no documento</span>
+        <label class="linha-op"><span>Valores pagos</span><span class="switch"><input type="checkbox" id="op-valores" checked><span></span></span></label>
+        <label class="linha-op"><span>Fotos das notas</span><span class="switch"><input type="checkbox" id="op-notas" checked><span></span></span></label>
+        <label class="linha-op"><span>Oficinas</span><span class="switch"><input type="checkbox" id="op-oficinas" checked><span></span></span></label>
+      </div>
+      <div class="grade" style="margin-top:14px">
+        <button class="btn btn-p btn-bloco" id="baixar" data-icone="baixar">Baixar PDF</button>
+        <a class="btn btn-s btn-bloco" id="whats" href="#" target="_blank" rel="noopener" data-icone="whatsapp">Enviar pelo WhatsApp</a>
+      </div>
+      <p class="mudo peq centro" style="margin-top:14px">O QR code abre a página pública do histórico, para o comprador conferir.</p>
+      <p class="mudo peq centro" style="margin-top:6px">No "Baixar PDF", escolha <strong>Salvar como PDF</strong> na janela de impressão.</p>
+    </aside>
+  </div>
+</main>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  VX.shell('garagem');
+  var d = VX.db(), esc = VX.esc, fmt = VX.fmt;
+  var c = VX.carro(d, VX.param('id')) || d.carros[0];
+  if (!c) location.replace('garagem.html');
+  var link = new URL('h.html?id=' + c.id, location.href).href;
+  document.getElementById('voltar').href = 'carro.html?id=' + c.id;
+  document.title = 'Histórico ' + VX.nomeCurto(c) + ' · VEXOcar';
+
+  var V_ESCURO = '<svg viewBox="18 20 84 80" aria-hidden="true"><polygon points="18,20 37,20 60,78 60,100 50,100" fill="#0E0F11"/><polygon points="83,20 102,20 70,100 60,100 60,78" fill="#13914E"/><line x1="91.6" y1="23" x2="66.2" y2="97" stroke="#fff" stroke-width="2.8" stroke-dasharray="8 6"/></svg>';
+
+  function desenhar() {
+    var valores = document.getElementById('op-valores').checked;
+    var notas = document.getElementById('op-notas').checked;
+    var oficinas = document.getElementById('op-oficinas').checked;
+    var ms = VX.manutDoCarro(d, c.id), ps = VX.pagamentosDoCarro(d, c.id), n = VX.nota(d, c);
+    var itens = ms.map(function (m) { return { data: m.data, m: m }; }).concat(ps.map(function (p) { return { data: p.data, p: p }; }))
+      .sort(function (a, b) { return a.data < b.data ? 1 : -1; });
+    var total = ms.reduce(function (s, m) { return s + m.valor; }, 0);
+    var verif = ms.filter(function (m) { return m.nota; }).length;
+
+    var linhas = itens.map(function (it) {
+      if (it.p) {
+        return '<tr><td>' + fmt.data(it.p.data) + '</td><td><span class="doc">' + VX.NOME_DOC[it.p.tipo] + ' ' + it.p.ano + ' pago</span></td><td class="col-km"></td>' +
+          (oficinas ? '<td class="col-of"></td>' : '') + (valores ? '<td class="v">' + fmt.moedaCheia(it.p.valor) + '</td>' : '') + '</tr>';
+      }
+      var m = it.m;
+      var extra = [];
+      extra.push(m.nota ? '<span class="ok">✓ com nota fiscal</span>' : 'sem nota fiscal');
+      if (notas && m.nota) extra.push('foto da nota na página pública');
+      return '<tr><td>' + fmt.data(m.data) + '</td><td>' + esc(m.servico) + (extra.length ? '<small>' + extra.join(' · ') + '</small>' : '') + '</td>' +
+        '<td class="v col-km">' + fmt.km(m.km) + '</td>' + (oficinas ? '<td class="col-of">' + esc(m.oficina || '—') + '</td>' : '') +
+        (valores ? '<td class="v">' + fmt.moedaCheia(m.valor) + '</td>' : '') + '</tr>';
+    }).join('');
+
+    document.getElementById('folha').innerHTML =
+      '<div class="f-topo"><span class="wm-escuro">' + V_ESCURO + 'EXO<span>car</span></span>' +
+      '<div class="doc-t">Histórico do veículo<br>gerado em ' + fmt.data(VX.hoje()) + '</div></div>' +
+      '<h2>' + esc(c.marca + ' ' + c.modelo + ' ' + c.versao) + '</h2>' +
+      '<p class="f-sub">Ano ' + c.ano + ' · placa ' + fmt.placa(c.placa) + ' · ' + fmt.km(c.km) + '</p>' +
+      '<div class="f-resumo">' + VX.gauge(n) + '<div class="f-num">' +
+        '<div><strong>' + n + '/100</strong><span>nota de saúde</span></div>' +
+        '<div><strong>' + ms.length + '</strong><span>manutenções</span></div>' +
+        '<div><strong>' + verif + '</strong><span>com nota fiscal</span></div></div></div>' +
+      '<h3>Linha do tempo (mais recentes primeiro)</h3>' +
+      '<table><thead><tr><th>Data</th><th>Serviço</th><th class="v col-km">Km</th>' + (oficinas ? '<th class="col-of">Oficina</th>' : '') + (valores ? '<th class="v">Valor</th>' : '') + '</tr></thead>' +
+      '<tbody>' + linhas + '</tbody>' +
+      (valores ? '<tfoot><tr><td colspan="' + (oficinas ? 4 : 3) + '">Total em manutenção</td><td class="v">' + fmt.moedaCheia(total) + '</td></tr></tfoot>' : '') + '</table>' +
+      '<div class="f-rodape"><div class="qr" id="qr"></div><div><p><strong style="color:#0E0F11">Confira a autenticidade</strong></p>' +
+      '<p>Leia o QR code com a câmera do celular para abrir a página pública deste histórico no VEXOcar, sempre atualizada.</p>' +
+      '<p style="margin-top:4px">A nota de saúde vai de 0 a 100 e considera revisões em dia, serviços com nota fiscal e pendências.</p></div></div>';
+
+    var qr = document.getElementById('qr');
+    if (window.QRCode) {
+      new QRCode(qr, { text: link, width: 192, height: 192, colorDark: '#0E0F11', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+      qr.removeAttribute('title');
+    } else {
+      qr.classList.add('qr-sem');
+      qr.textContent = link;
+    }
+    VX.animarGauges(document.getElementById('folha'));
+  }
+
+  ['op-valores', 'op-notas', 'op-oficinas'].forEach(function (id) { document.getElementById(id).addEventListener('change', desenhar); });
+  document.getElementById('baixar').addEventListener('click', function () { window.print(); });
+  document.getElementById('whats').href = VX.whats('', 'Olha o histórico completo do meu ' + VX.nomeCarro(c) + ' no VEXOcar: ' + link);
+  desenhar();
+</script>
+</body>
+</html>

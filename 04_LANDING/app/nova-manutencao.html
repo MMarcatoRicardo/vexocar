@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nova manutenção · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  .form-manut { max-width: 720px; }
+  .conteudo > * { max-width: 720px; margin-inline: auto; }
+  .foto-up { min-height: 120px; }
+  .chip-carro img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; margin-left: -6px; }
+</style>
+</head>
+<!-- Tela 06: Nova manutenção. Registro em menos de 1 minuto; ao salvar, recalcula a nota de saúde e os alertas. -->
+<body class="shell" data-pilha="nao">
+<main class="conteudo entra">
+  <header class="topo">
+    <a class="voltar" id="fechar" href="garagem.html" aria-label="Fechar" data-icone="fechar"></a>
+    <h1>Nova manutenção</h1>
+  </header>
+
+  <form class="form form-manut" id="form" novalidate hidden>
+    <div class="campo">
+      <span class="rotulo-campo">Carro</span>
+      <div class="chips quebra" id="carros" role="group" aria-label="Escolha o carro"></div>
+    </div>
+
+    <div class="lado">
+      <div class="campo">
+        <label for="data">Data</label>
+        <input id="data" type="date" required>
+      </div>
+      <div class="campo">
+        <label for="km">Km no dia</label>
+        <input id="km" inputmode="numeric" required>
+        <span class="msg-erro" hidden>Informe o km do painel.</span>
+      </div>
+    </div>
+
+    <div class="campo">
+      <span class="rotulo-campo">Serviço</span>
+      <div class="chips quebra" id="tipos" role="group" aria-label="Tipo de serviço"></div>
+    </div>
+
+    <div class="campo">
+      <label for="servico">Descrição do serviço</label>
+      <input id="servico" placeholder="Troca de óleo e filtro" required>
+      <span class="msg-erro" hidden>Descreva o serviço.</span>
+    </div>
+    <div class="campo">
+      <label for="pecas">Peças trocadas</label>
+      <input id="pecas" placeholder="Óleo 5W30, filtro de óleo">
+    </div>
+
+    <div class="lado">
+      <div class="campo">
+        <label for="valor">Valor (R$)</label>
+        <input id="valor" inputmode="decimal" placeholder="389,90" required>
+        <span class="msg-erro" hidden>Informe o valor.</span>
+      </div>
+      <div class="campo">
+        <label for="oficina">Oficina</label>
+        <input id="oficina" list="oficinas" placeholder="Oficina do Zé">
+        <datalist id="oficinas"></datalist>
+      </div>
+    </div>
+
+    <label class="foto-up" id="nota-box">
+      <input type="file" accept="image/*" id="nota" aria-label="Foto da nota fiscal">
+      <span data-icone="camera"></span>
+      <span>Foto da nota fiscal<br><span class="peq">a nota fiscal comprova o serviço no histórico</span></span>
+    </label>
+
+    <div class="fila-btn">
+      <a class="btn btn-s" id="cancelar" href="garagem.html" data-voltar>Cancelar</a>
+      <button class="btn btn-p" type="submit" data-icone="check">Salvar manutenção</button>
+    </div>
+  </form>
+
+  <section class="vazio" id="vazio" hidden>
+    <h2>Nenhum carro na garagem</h2>
+    <p>Cadastre um carro antes de registrar manutenções.</p>
+    <a class="btn btn-p" href="adicionar-carro.html" data-icone="mais">Adicionar carro</a>
+  </section>
+</main>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  VX.shell('garagem');
+  var d = VX.db(), esc = VX.esc;
+  var SUGESTAO = { revisao: 'Revisão periódica', oleo: 'Troca de óleo e filtro', freios: 'Pastilhas de freio', pneus: 'Troca de pneus',
+    suspensao: 'Amortecedores', eletrica: 'Bateria nova', outro: '' };
+
+  if (!d.carros.length) {
+    document.getElementById('vazio').hidden = false;
+  } else {
+    document.getElementById('form').hidden = false;
+    var carroSel = (VX.carro(d, VX.param('carro')) || d.carros[0]).id;
+    var tipoSel = VX.NOME_TIPO[VX.param('tipo')] ? VX.param('tipo') : 'oleo';
+    var notaFoto = ''; // foto da nota fiscal (a prova do serviço); no modo API vai para o Cloudinary
+    var kmEl = document.getElementById('km'), servEl = document.getElementById('servico');
+
+    if (VX.param('carro')) {
+      document.getElementById('fechar').href = 'carro.html?id=' + carroSel;
+      document.getElementById('cancelar').href = 'carro.html?id=' + carroSel;
+    }
+    document.getElementById('data').value = VX.isoData(VX.hoje());
+    document.getElementById('data').max = VX.isoData(VX.hoje());
+    document.getElementById('oficinas').innerHTML = d.oficinas.map(function (o) { return '<option value="' + esc(o.nome) + '">'; }).join('');
+
+    function carros() {
+      document.getElementById('carros').innerHTML = d.carros.map(function (c) {
+        return '<button type="button" class="chip chip-carro" aria-pressed="' + (c.id === carroSel) + '" data-c="' + c.id + '">' +
+          '<img src="' + esc(c.foto) + '" alt="">' + esc(VX.nomeCurto(c)) + '</button>';
+      }).join('');
+      var c = VX.carro(d, carroSel);
+      kmEl.value = c.km.toLocaleString('pt-BR');
+    }
+    function tipos() {
+      document.getElementById('tipos').innerHTML = Object.keys(VX.NOME_TIPO).map(function (t) {
+        return '<button type="button" class="chip" aria-pressed="' + (t === tipoSel) + '" data-t="' + t + '">' + VX.NOME_TIPO[t] + '</button>';
+      }).join('');
+    }
+    carros(); tipos();
+    servEl.value = SUGESTAO[tipoSel];
+    var sugestaoAtual = servEl.value;
+
+    document.getElementById('carros').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-c]'); if (!b) return;
+      carroSel = b.dataset.c; carros();
+    });
+    document.getElementById('tipos').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-t]'); if (!b) return;
+      tipoSel = b.dataset.t; tipos();
+      // só troca a descrição se a pessoa ainda não escreveu a sua
+      if (servEl.value === sugestaoAtual) { servEl.value = SUGESTAO[tipoSel]; sugestaoAtual = servEl.value; }
+    });
+    kmEl.addEventListener('input', function () { var n = parseInt(kmEl.value.replace(/\D/g, ''), 10); kmEl.value = n ? n.toLocaleString('pt-BR') : ''; });
+
+    document.getElementById('nota').addEventListener('change', function (e) {
+      var f = e.target.files[0]; if (!f) return;
+      VX.lerFoto(f, 500).then(function (url) {
+        notaFoto = url;
+        var box = document.getElementById('nota-box');
+        var img = box.querySelector('img') || document.createElement('img');
+        img.src = url; img.alt = 'Foto da nota fiscal'; box.appendChild(img);
+      }).catch(function () { VX.toast('Não deu para ler essa imagem.'); });
+    });
+
+    function marca(id, ok) {
+      var c = document.getElementById(id).closest('.campo');
+      c.classList.toggle('erro', !ok); c.querySelector('.msg-erro').hidden = ok; return ok;
+    }
+
+    document.getElementById('form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var km = parseInt(kmEl.value.replace(/\D/g, ''), 10) || 0;
+      var valor = parseFloat(document.getElementById('valor').value.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')) || 0;
+      var ok = [marca('km', km > 0), marca('servico', servEl.value.trim() !== ''), marca('valor', valor > 0)];
+      if (ok.indexOf(false) >= 0) { document.querySelector('.campo.erro input').focus(); return; }
+      var nomeOf = document.getElementById('oficina').value.trim();
+      var of = d.oficinas.filter(function (o) { return o.nome.toLowerCase() === nomeOf.toLowerCase(); })[0];
+      d.manutencoes.push({
+        id: VX.novoId('m'), carroId: carroSel, data: document.getElementById('data').value || VX.isoData(VX.hoje()), km: km,
+        tipo: tipoSel, servico: servEl.value.trim(), pecas: document.getElementById('pecas').value.trim(), valor: valor,
+        oficina: of ? of.nome : nomeOf, oficinaId: of ? of.id : null, nota: !!notaFoto, notaFoto: notaFoto
+      });
+      var c = VX.carro(d, carroSel);
+      if (km > c.km) c.km = km;
+      VX.salvar(d);
+      VX.avisoDepois('Manutenção salva. Nota de saúde recalculada.');
+      location.href = 'carro.html?id=' + carroSel;
+    });
+  }
+</script>
+</body>
+</html>

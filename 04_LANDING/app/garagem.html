@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minha garagem · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<!-- Telas 03 (Minha garagem) e 17 (Garagem vazia). Primeira tela depois do login. -->
+<body class="shell">
+<main class="conteudo entra">
+  <header class="topo">
+    <div>
+      <h1>Minha garagem</h1>
+    </div>
+    <div class="acoes-topo">
+      <a class="btn btn-p btn-peq so-pc" href="nova-manutencao.html" data-icone="mais">Nova manutenção</a>
+      <a class="avatar so-celular" href="perfil.html" id="avatar" aria-label="Perfil"></a>
+    </div>
+  </header>
+  <p class="topo-sub" id="ola"></p>
+
+  <div id="cheia" hidden>
+    <div class="grade grade-3" id="resumo"></div>
+    <p style="text-align:right;margin-top:8px"><a class="link" href="gastos.html">Ver todos os gastos ›</a></p>
+
+    <div id="avisos" class="grade" style="margin-top:12px"></div>
+
+    <div class="secao-t"><h2>Meus carros</h2><a href="adicionar-carro.html">+ Adicionar carro</a></div>
+    <div class="grade grade-2" id="carros"></div>
+  </div>
+
+  <!-- Tela 17: garagem vazia (primeiro acesso) -->
+  <section class="vazio" id="vazia" hidden>
+    <svg class="ilus" viewBox="0 0 200 120" fill="none" aria-hidden="true">
+      <path d="M10 104h180" stroke="#2A2D33" stroke-width="3" stroke-dasharray="14 10"/>
+      <path d="M38 86V70l14-24c3-5 7-8 13-8h58c6 0 10 3 14 8l19 24c6 1 10 5 10 11v5" stroke="#F2F1EC" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M38 86h128" stroke="#F2F1EC" stroke-width="4"/>
+      <circle cx="66" cy="88" r="12" stroke="#2FD47A" stroke-width="4" fill="#0E0F11"/>
+      <circle cx="140" cy="88" r="12" stroke="#2FD47A" stroke-width="4" fill="#0E0F11"/>
+      <path d="M60 66l10-18h28v18zM106 66V48h18l13 18z" fill="#23262B"/>
+    </svg>
+    <h2>Sua garagem está vazia</h2>
+    <p>Cadastre seu carro para receber os alertas de revisão, IPVA e licenciamento.</p>
+    <a class="btn btn-p" href="adicionar-carro.html" data-icone="mais">Adicionar meu primeiro carro</a>
+    <div class="cartao" style="text-align:left;margin-top:16px;max-width:380px;width:100%">
+      <p class="peq" style="display:flex;gap:8px;color:var(--off2)"><span style="color:var(--verde)">✓</span> Lembrete de revisão por km e por data</p>
+      <p class="peq" style="display:flex;gap:8px;color:var(--off2);margin-top:8px"><span style="color:var(--verde)">✓</span> Histórico com nota fiscal e foto</p>
+      <p class="peq" style="display:flex;gap:8px;color:var(--off2);margin-top:8px"><span style="color:var(--verde)">✓</span> PDF pronto para vender o carro</p>
+    </div>
+  </section>
+</main>
+
+<a class="fab" href="nova-manutencao.html" aria-label="Nova manutenção" data-icone="mais" id="fab"></a>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  VX.shell('garagem');
+  var d = VX.db(), esc = VX.esc, fmt = VX.fmt;
+
+  document.getElementById('avatar').textContent = VX.iniciais(d.usuario.nome);
+  var h = new Date().getHours();
+  document.getElementById('ola').textContent = (h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite') + ', ' + d.usuario.nome.split(' ')[0] + '.';
+
+  if (!d.carros.length) {
+    document.getElementById('vazia').hidden = false;
+    document.getElementById('fab').hidden = true;
+  } else {
+    document.getElementById('cheia').hidden = false;
+
+    // Aviso: o alerta mais urgente que ainda não foi lido
+    var av = '';
+    var urg = VX.alertas(d).filter(function (a) { return (a.status === 'vencido' || a.status === 'proximo') && !a.visto; })[0];
+    if (urg) {
+      var cu = VX.carro(d, urg.carroId);
+      av += '<a class="aviso' + (urg.status === 'vencido' ? ' erro' : '') + '" href="alertas.html">' + VX.icone('alerta') +
+        '<span><strong>' + esc(urg.titulo) + '</strong> · ' + esc(cu.modelo) + '<br><span class="mudo peq">' + esc(urg.texto) + '</span></span></a>';
+    }
+    document.getElementById('avisos').innerHTML = av;
+
+    // Carros
+    document.getElementById('carros').innerHTML = d.carros.map(function (c) {
+      var n = VX.nota(d, c), ms = VX.manutDoCarro(d, c.id);
+      return '<a class="cartao cartao-link carro-item" href="carro.html?id=' + c.id + '">' +
+        '<div class="thumb"><img src="' + esc(c.foto) + '" alt="" loading="lazy"></div>' +
+        '<div class="info"><h3>' + esc(c.modelo) + ' <span class="mudo">' + c.ano + '</span></h3>' +
+        '<p class="mudo peq">' + esc(c.marca) + ' · <span class="placa">' + fmt.placa(c.placa) + '</span></p>' +
+        '<p class="mudo peq">' + fmt.km(c.km) + ' · ' + ms.length + ' manutenções</p></div>' + VX.gauge(n) + '</a>';
+    }).join('') +
+      '<a class="cartao cartao-link foto-up" href="adicionar-carro.html" style="min-height:108px">' + VX.icone('mais') + 'Adicionar carro</a>';
+
+    // Resumo de gastos
+    var mesAtual = VX.isoData(VX.hoje()).slice(0, 7), ano = VX.hoje().getFullYear();
+    var noMes = 0, em12 = 0, kmMin = Infinity, kmMax = 0, limite = VX.isoData(new Date(ano - 1, VX.hoje().getMonth(), VX.hoje().getDate()));
+    d.manutencoes.forEach(function (m) {
+      if (m.data.slice(0, 7) === mesAtual) noMes += m.valor;
+      if (m.data >= limite) { em12 += m.valor; }
+    });
+    var kmRodado = d.carros.reduce(function (s, c) { return s + c.kmMes * 12; }, 0);
+    var porKm = kmRodado ? em12 / kmRodado : 0;
+    document.getElementById('resumo').innerHTML =
+      '<div class="cartao kpi"><span class="rotulo">Gasto em ' + ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][VX.hoje().getMonth()] + '</span><strong>' + fmt.moedaCheia(noMes) + '</strong><small>' + (noMes ? 'neste mês' : 'nada registrado ainda') + '</small></div>' +
+      '<div class="cartao kpi"><span class="rotulo">Últimos 12 meses</span><strong>' + fmt.moedaCheia(em12) + '</strong><small>' + d.carros.length + ' carros</small></div>' +
+      '<div class="cartao kpi"><span class="rotulo">Custo por km</span><strong>' + fmt.moedaCheia(porKm) + '</strong><small>' + (d.usuario.perfil === 'motorista' ? 'entra na conta da corrida' : 'manutenção por km rodado') + '</small></div>';
+
+    VX.animarGauges();
+  }
+</script>
+</body>
+</html>

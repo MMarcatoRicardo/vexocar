@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Histórico do veículo · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  .pub-barra { position: sticky; top: 0; z-index: 20; background: rgba(14, 15, 17, .9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--linha); }
+  .pub-barra > div { max-width: 760px; margin: 0 auto; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .pub { max-width: 760px; margin: 0 auto; padding: 24px 16px 56px; }
+  .autentico { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--verde); background: var(--verde-fundo); border: 1px solid rgba(47, 212, 122, .35); border-radius: 999px; padding: 5px 11px; white-space: nowrap; }
+  .autentico svg { width: 15px; height: 15px; }
+  .pub-capa { aspect-ratio: 16 / 8; border-radius: var(--r-g); overflow: hidden; background: var(--grafite3); }
+  .pub-capa img { width: 100%; height: 100%; object-fit: cover; }
+  .pub h1 { font-family: var(--titulo); font-weight: 400; font-size: clamp(26px, 6vw, 36px); line-height: 1.15; margin-top: 22px; }
+  .pub-saude { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+  .pub-num { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1; min-width: 240px; }
+  .pub-num strong { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
+  .pub-num .ok { color: var(--verde); }
+  .pub-num .pend { color: var(--ambar); }
+  .convite { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; background: linear-gradient(135deg, var(--grafite2), rgba(47, 212, 122, .08)); }
+  .convite > div { flex: 1 1 260px; }
+  .convite h2 { font-size: 18px; font-weight: 600; }
+</style>
+</head>
+<!-- Tela 22: Histórico público (QR code do PDF). O comprador vê sem precisar de conta. Sem valores em R$ (privacidade do dono). -->
+<body>
+<header class="pub-barra">
+  <div>
+    <a class="wm" href="../index.html" aria-label="VEXOcar"><svg><use href="#v"/></svg>EXO<span>car</span></a>
+    <span class="autentico" id="selo-autentico" hidden></span>
+  </div>
+</header>
+
+<main class="pub entra" id="pub"></main>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  VX.simbolo();
+  var esc = VX.esc, fmt = VX.fmt, pub = document.getElementById('pub');
+  // Demonstração: lê do navegador. Modo API: busca na API o histórico público (sem login, sem valores, placa mascarada).
+  if (VXAPI.ativo) VXAPI.publico(VX.param('id')).then(mostrar, function () { mostrar({ carros: [] }); });
+  else mostrar(VX.db());
+
+  function mostrar(d) {
+  var c = VX.carro(d, VX.param('id') || 'c1');
+
+  if (!c) {
+    document.title = 'Histórico não encontrado · VEXOcar';
+    pub.innerHTML = '<section class="vazio"><h2>Histórico não encontrado</h2>' +
+      '<p>Esse QR code não corresponde a nenhum carro. Ele pode ter sido transferido para outro dono ou o endereço está incompleto.</p>' +
+      '<a class="btn btn-p" href="../index.html">Conhecer o VEXOcar</a></section>';
+  } else {
+    var ms = VX.manutDoCarro(d, c.id), ps = VX.pagamentosDoCarro(d, c.id), n = VX.nota(d, c);
+    var verif = ms.filter(function (m) { return m.nota; }).length;
+    var rev = VX.alertasCarro(d, c).filter(function (a) { return a.tipo === 'revisao'; })[0];
+    var revOk = rev && rev.status !== 'vencido';
+    document.title = 'Histórico do ' + VX.nomeCarro(c) + ' · VEXOcar';
+    var selo = document.getElementById('selo-autentico');
+    selo.innerHTML = VX.icone('verificado') + 'Documento autêntico';
+    selo.hidden = false;
+
+    // Linha do tempo pública: manutenções + impostos pagos, sem valores
+    var itens = ms.map(function (m) { return { k: 'm', data: m.data, m: m }; })
+      .concat(ps.map(function (p) { return { k: 'd', data: p.data, p: p }; }))
+      .sort(function (a, b) { return a.data < b.data ? 1 : -1; });
+    var linha = '', anoAtual = null;
+    itens.forEach(function (it) {
+      var ano = it.data.slice(0, 4);
+      if (ano !== anoAtual) { linha += '<div class="lt-ano">' + ano + '</div>'; anoAtual = ano; }
+      if (it.k === 'd') {
+        linha += '<div class="lt-item doc"><div class="lt-cab"><strong>' + VX.NOME_DOC[it.p.tipo] + ' ' + it.p.ano + '</strong><span class="tag tag-v">' + VX.icone('check') + 'Pago</span></div>' +
+          '<div class="lt-meta">' + fmt.data(it.p.data) + '</div></div>';
+      } else {
+        var m = it.m;
+        linha += '<div class="lt-item' + (m.nota ? ' comprovado' : '') + '"><div class="lt-cab"><strong>' + esc(m.servico) + '</strong></div>' +
+          '<div class="lt-meta">' + fmt.data(m.data) + ' · ' + fmt.km(m.km) + ' · ' + esc(m.oficina || 'sem oficina') + '</div>' +
+          '<div class="lt-tags">' + (m.nota ? '<span class="tag tag-v">' + VX.icone('documento') + 'Nota fiscal anexada</span>' : '<span class="tag">Sem nota fiscal</span>') + '</div></div>';
+      }
+    });
+
+    pub.innerHTML =
+      '<div class="pub-capa"><img src="' + esc(c.foto) + '" alt="Foto do ' + esc(VX.nomeCarro(c)) + '"></div>' +
+      '<h1>' + esc(c.marca + ' ' + c.modelo) + ' ' + c.ano + '</h1>' +
+      '<p class="mudo" style="margin-top:6px">' + esc(c.versao) + ' · <span class="placa">' + (/\*/.test(c.placa) ? esc(c.placa) : fmt.placa(c.placa)) + '</span> · ' + fmt.km(c.km) + '</p>' +
+      '<p class="mudo peq" style="margin-top:4px">Histórico gerado em ' + fmt.data(VX.hoje()) + ' pelo VEXOcar</p>' +
+
+      '<section class="cartao" style="margin-top:20px"><div class="pub-saude">' + VX.gauge(n, 'g') +
+        '<div style="flex:1;min-width:240px"><span class="rotulo">Nota de saúde</span><p style="margin:4px 0 14px">' + esc(VX.textoNota(n)) + '</p>' +
+        '<div class="pub-num">' +
+          '<div><strong>' + ms.length + '</strong><span class="mudo peq">manutenções</span></div>' +
+          '<div><strong>' + verif + '</strong><span class="mudo peq">com nota fiscal</span></div>' +
+          '<div><strong class="' + (revOk ? 'ok' : 'pend') + '">' + (revOk ? 'Em dia' : 'Pendente') + '</strong><span class="mudo peq">revisões</span></div>' +
+        '</div></div></div></section>' +
+
+      '<div class="secao-t"><h2>Linha do tempo <span class="mudo peq" style="font-weight:400">· mais recentes primeiro</span></h2></div>' +
+      '<section class="cartao">' +
+        '<div class="legenda" style="margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--linha)">' +
+          '<span><i class="v"></i>Com nota fiscal (comprovado)</span><span><i></i>Sem nota fiscal</span><span><i class="d"></i>IPVA e licenciamento</span></div>' +
+        '<div class="linha-tempo">' + (linha || '<p class="mudo">Nenhum registro ainda.</p>') + '</div>' +
+      '</section>' +
+      '<p class="mudo peq" style="margin-top:12px">Os valores pagos ficam ocultos para proteger a privacidade do dono. Os serviços em verde têm a nota fiscal anexada pelo dono.</p>' +
+
+      '<section class="cartao convite" style="margin-top:28px"><div><h2>Também tem carro?</h2><p class="mudo">Guarde o histórico do seu e venda por mais.</p></div>' +
+        '<a class="btn btn-p" href="criar-conta.html">Criar minha conta</a></section>';
+    VX.animarGauges();
+  }
+  }
+</script>
+</body>
+</html>

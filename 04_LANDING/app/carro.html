@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Detalhe do carro · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  @media (min-width: 960px) { .carro-detalhe { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); } }
+  .capa-carro { aspect-ratio: 16 / 10; border-radius: var(--r-g); overflow: hidden; background: var(--grafite3); }
+  .capa-carro img { width: 100%; height: 100%; object-fit: cover; }
+  .saude { display: flex; align-items: center; gap: 18px; }
+  .numeros { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--linha); }
+  .numeros strong { display: block; font-size: 18px; font-variant-numeric: tabular-nums; }
+  .km-form { display: flex; gap: 8px; align-items: flex-end; }
+  .km-form .campo { flex: 1; }
+  .lt-avaliar { display: inline-block; margin-top: 8px; font-weight: 500; }
+</style>
+</head>
+<!-- Tela 05: o prontuário do carro (nota de saúde, linha do tempo e atalhos). -->
+<body class="shell">
+<main class="conteudo entra">
+  <header class="topo">
+    <a class="voltar" href="garagem.html" aria-label="Voltar para a garagem" data-icone="voltar"></a>
+    <h1 id="titulo">Carro</h1>
+  </header>
+
+  <div class="duas-col carro-detalhe">
+    <aside class="fixo">
+      <div class="capa-carro"><img id="foto" src="" alt=""></div>
+
+      <div class="cartao" style="margin-top:14px">
+        <div class="saude">
+          <div id="gauge"></div>
+          <div>
+            <span class="rotulo">Nota de saúde</span>
+            <p id="nota-txt" style="margin-top:4px"></p>
+            <p class="mudo peq" id="placa"></p>
+          </div>
+        </div>
+        <div class="numeros" id="numeros"></div>
+      </div>
+
+      <div class="fila-btn" style="margin-top:14px">
+        <a class="btn btn-p" id="btn-manut" href="#" data-icone="mais">Manutenção</a>
+        <a class="btn btn-s" id="btn-pdf" href="#" data-icone="documento">Histórico PDF</a>
+      </div>
+      <a class="btn btn-g btn-bloco" id="btn-anunciar" href="#" style="margin-top:8px" data-icone="vitrine">Anunciar na vitrine</a>
+
+      <form class="cartao km-form" id="km-form" style="margin-top:14px">
+        <div class="campo">
+          <label for="km">Km atual</label>
+          <input id="km" inputmode="numeric" autocomplete="off">
+        </div>
+        <button class="btn btn-s" type="submit">Atualizar</button>
+      </form>
+    </aside>
+
+    <section>
+      <div id="alertas"></div>
+      <div class="secao-t" style="margin-top:0"><h2>Linha do tempo <span class="mudo peq" id="qtd" style="font-weight:400"></span></h2>
+        <button class="ordem" id="ordem" type="button"></button></div>
+      <div class="chips" id="filtros" role="group" aria-label="Filtrar por tipo"></div>
+      <div class="cartao" style="margin-top:14px">
+        <div class="legenda" style="margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--linha)">
+          <span><i class="v"></i>Com nota fiscal (comprovado)</span>
+          <span><i></i>Sem nota fiscal</span>
+          <span><i class="d"></i>IPVA e licenciamento</span>
+        </div>
+        <div class="linha-tempo" id="linha"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  VX.shell('garagem');
+  var d = VX.db(), esc = VX.esc, fmt = VX.fmt;
+  var c = VX.carro(d, VX.param('id')) || d.carros[0];
+  if (!c) location.replace('garagem.html');
+
+  function desenhar() {
+    var ms = VX.manutDoCarro(d, c.id), n = VX.nota(d, c);
+    document.title = VX.nomeCurto(c) + ' · VEXOcar';
+    document.getElementById('titulo').textContent = c.modelo + ' ' + c.ano;
+    var foto = document.getElementById('foto');
+    foto.src = c.foto; foto.alt = 'Foto do ' + VX.nomeCarro(c);
+    document.getElementById('gauge').innerHTML = VX.gauge(n, 'g');
+    document.getElementById('nota-txt').textContent = VX.textoNota(n);
+    document.getElementById('placa').innerHTML = esc(c.marca + ' ' + c.modelo + ' ' + c.versao) + '<br><span class="placa">' + fmt.placa(c.placa) + '</span> · ' + fmt.km(c.km);
+    var total = ms.reduce(function (s, m) { return s + m.valor; }, 0);
+    document.getElementById('numeros').innerHTML =
+      '<div><strong>' + ms.length + '</strong><span class="mudo peq">manutenções</span></div>' +
+      '<div><strong>' + ms.filter(function (m) { return m.nota; }).length + '</strong><span class="mudo peq">com nota fiscal</span></div>' +
+      '<div><strong>' + fmt.moeda(Math.round(total)) + '</strong><span class="mudo peq">em manutenção</span></div>';
+    document.getElementById('btn-manut').href = 'nova-manutencao.html?carro=' + c.id;
+    document.getElementById('btn-pdf').href = 'historico-pdf.html?id=' + c.id;
+    var anuncio = d.meusAnuncios.filter(function (a) { return a.carroId === c.id && !a.vendido; })[0];
+    var ba = document.getElementById('btn-anunciar');
+    if (anuncio) { ba.lastChild.textContent = 'Ver meu anúncio'; ba.href = 'anuncio.html?id=' + anuncio.id; }
+    else ba.href = 'anunciar.html?carro=' + c.id;
+    document.getElementById('km').value = c.km.toLocaleString('pt-BR');
+
+    // Alertas deste carro
+    var al = VX.alertasCarro(d, c).filter(function (a) { return a.status === 'vencido' || a.status === 'proximo'; });
+    document.getElementById('alertas').innerHTML = al.length ? '<div class="grade" style="margin-bottom:24px">' + al.map(function (a) {
+      return '<a class="aviso' + (a.status === 'vencido' ? ' erro' : '') + '" href="alertas.html">' + VX.icone('alerta') +
+        '<span><strong>' + esc(a.titulo) + '</strong> ' + VX.tagStatus(a.status) + '<br><span class="mudo peq">' + esc(a.texto) + '</span></span></a>';
+    }).join('') + '</div>' : '<div class="aviso ok" style="margin-bottom:24px">' + VX.icone('verificado') + '<span>Tudo em dia com este carro.</span></div>';
+
+    desenharLinha();
+    VX.animarGauges();
+  }
+
+  // Linha do tempo: manutenções + IPVA/licenciamento pagos, agrupados por ano.
+  var filtro = 'todos', recentes = true;
+  var FILTROS = [['todos', 'Todos'], ['revisao', 'Revisão'], ['oleo', 'Óleo'], ['freios', 'Freios'], ['pneus', 'Pneus'], ['outros', 'Outros'], ['docs', 'Impostos']];
+  function itensDaLinha() {
+    var ms = VX.manutDoCarro(d, c.id).map(function (m) { return { k: 'm', data: m.data, m: m }; });
+    var ps = VX.pagamentosDoCarro(d, c.id).map(function (p) { return { k: 'd', data: p.data, p: p }; });
+    return ms.concat(ps).filter(function (it) {
+      if (filtro === 'todos') return true;
+      if (filtro === 'docs') return it.k === 'd';
+      if (it.k === 'd') return false;
+      if (filtro === 'outros') return ['suspensao', 'eletrica', 'outro'].indexOf(it.m.tipo) >= 0;
+      return it.m.tipo === filtro;
+    }).sort(function (a, b) { return (a.data < b.data ? 1 : -1) * (recentes ? 1 : -1); });
+  }
+  /* Convite para avaliar a oficina do serviço, enquanto o usuário ainda não avaliou. */
+  function linkAvaliar(m) {
+    if (!m.oficinaId || VX.minhaAvaliacao(d, m.oficinaId)) return '';
+    var o = d.oficinas.filter(function (x) { return x.id === m.oficinaId; })[0];
+    return o ? '<a class="link peq lt-avaliar" href="oficina.html?id=' + o.id + '&avaliar=1">Avaliar ' + esc(o.nome) + ' ›</a>' : '';
+  }
+  function htmlItem(it) {
+    if (it.k === 'd') {
+      var p = it.p;
+      return '<div class="lt-item doc">' +
+        '<div class="lt-cab"><strong>' + VX.NOME_DOC[p.tipo] + ' ' + p.ano + ' pago</strong><span class="num">' + fmt.moedaCheia(p.valor) + '</span></div>' +
+        '<div class="lt-meta">' + fmt.data(p.data) + ' · placa final ' + VX.finalPlaca(c) + '</div>' +
+        '<div class="lt-tags"><span class="tag tag-a">' + VX.icone('documento') + 'Imposto / taxa</span></div></div>';
+    }
+    var m = it.m;
+    return '<div class="lt-item' + (m.nota ? ' comprovado' : '') + '">' +
+      '<div class="lt-cab"><strong>' + esc(m.servico) + '</strong><span class="num">' + fmt.moedaCheia(m.valor) + '</span></div>' +
+      '<div class="lt-meta">' + fmt.data(m.data) + ' · ' + fmt.km(m.km) + ' · ' + esc(m.oficina || 'sem oficina') + '</div>' +
+      (m.pecas ? '<div class="lt-meta">' + esc(m.pecas) + '</div>' : '') +
+      '<div class="lt-tags">' + (m.nota ? '<span class="tag tag-v">' + VX.icone('documento') + 'Nota fiscal anexada</span>' : '<span class="tag">Sem nota fiscal</span>') + '</div>' +
+      linkAvaliar(m) + '</div>';
+  }
+  function desenharLinha() {
+    document.getElementById('filtros').innerHTML = FILTROS.map(function (f) {
+      return '<button class="chip" aria-pressed="' + (f[0] === filtro) + '" data-f="' + f[0] + '">' + f[1] + '</button>';
+    }).join('');
+    var o = document.getElementById('ordem');
+    o.className = 'ordem' + (recentes ? '' : ' asc');
+    o.innerHTML = VX.icone('baixar') + (recentes ? 'Mais recentes primeiro' : 'Mais antigos primeiro');
+    o.setAttribute('aria-label', 'Ordem: ' + o.textContent + '. Clique para inverter.');
+    var lista = itensDaLinha(), html = '', anoAtual = null;
+    lista.forEach(function (it) {
+      var ano = it.data.slice(0, 4);
+      if (ano !== anoAtual) { html += '<div class="lt-ano">' + ano + '</div>'; anoAtual = ano; }
+      html += htmlItem(it);
+    });
+    document.getElementById('qtd').textContent = '· ' + lista.length + (lista.length === 1 ? ' registro' : ' registros');
+    document.getElementById('linha').innerHTML = html || '<p class="mudo">Nenhum registro deste tipo.</p>';
+  }
+  document.getElementById('filtros').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-f]');
+    if (!b) return;
+    filtro = b.dataset.f;
+    desenharLinha();
+  });
+  document.getElementById('ordem').addEventListener('click', function () { recentes = !recentes; desenharLinha(); });
+
+  // Atualizar km (recalcula alertas e nota)
+  document.getElementById('km-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = parseInt(document.getElementById('km').value.replace(/\D/g, ''), 10);
+    if (!v || v < c.km) { VX.toast('O km novo precisa ser maior que ' + fmt.km(c.km)); return; }
+    c.km = v; VX.salvar(d); desenhar();
+    VX.toast('Km atualizado. Alertas recalculados.');
+  });
+
+  desenhar();
+</script>
+</body>
+</html>

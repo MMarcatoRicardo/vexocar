@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perfil · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  .perfil-wrap { max-width: 720px; margin: 0 auto; }
+  .eu-cartao { display: flex; align-items: center; gap: 18px; }
+  .eu-cartao h2 { font-size: 20px; font-weight: 600; }
+  .lista-ic > * { gap: 14px; }
+  .lista-ic svg { width: 20px; height: 20px; color: var(--cinza); flex: none; }
+  .lista-ic .seta svg { width: 18px; height: 18px; }
+  .lista-ic .qtd { margin-left: auto; color: var(--cinza); font-size: 14px; }
+  .lista-ic .qtd + .seta { margin-left: 4px; }
+  .lista-ic button { width: 100%; text-align: left; }
+  .switch-linha { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--linha); cursor: pointer; }
+  .switch-linha:last-child { border-bottom: 0; }
+  .switch-linha small { display: block; color: var(--cinza); font-size: 13px; }
+  .sair { color: var(--erro) !important; }
+  .sair svg { color: var(--erro) !important; }
+</style>
+</head>
+<!-- Tela 18: Perfil e configurações. Abre pelo avatar da garagem. Notificações, favoritos, anúncios, restaurar dados e sair. -->
+<body class="shell">
+<main class="conteudo entra">
+  <div class="perfil-wrap">
+    <header class="topo">
+      <a class="voltar" href="garagem.html" aria-label="Voltar para a garagem" data-icone="voltar"></a>
+      <h1>Perfil</h1>
+    </header>
+
+    <section class="cartao">
+      <div class="eu-cartao">
+        <span class="avatar g" id="avatar"></span>
+        <div style="min-width:0">
+          <h2 id="nome"></h2>
+          <p class="mudo peq" id="email"></p>
+          <p class="mudo peq" id="desde"></p>
+        </div>
+      </div>
+      <div class="campo" style="margin-top:18px">
+        <span class="rotulo-campo" id="perfil-rot">Você é</span>
+        <div class="chips" role="group" aria-labelledby="perfil-rot" id="perfil">
+          <button type="button" class="chip" data-p="motorista">Motorista de app</button>
+          <button type="button" class="chip" data-p="dono">Dono(a) de carro</button>
+        </div>
+        <span class="ajuda" id="perfil-ajuda"></span>
+      </div>
+    </section>
+
+    <div class="secao-t"><h2>Notificações</h2></div>
+    <section class="cartao" style="padding-block:4px" id="notif"></section>
+
+    <div class="secao-t"><h2>Minha conta</h2></div>
+    <section class="cartao" style="padding-block:4px">
+      <div class="lista lista-ic">
+        <button type="button" id="meus-dados"><span data-icone="usuario"></span>Meus dados<span class="seta" data-icone="seta"></span></button>
+        <a href="vitrine.html?fav=1"><span data-icone="coracao"></span>Favoritos<span class="qtd" id="n-fav"></span><span class="seta" data-icone="seta"></span></a>
+        <a href="vitrine.html?meus=1"><span data-icone="vitrine"></span>Meus anúncios<span class="qtd" id="n-anun"></span><span class="seta" data-icone="seta"></span></a>
+        <a href="termos.html"><span data-icone="documento"></span>Termos e privacidade<span class="seta" data-icone="seta"></span></a>
+      </div>
+    </section>
+
+    <div class="secao-t"><h2>Demonstração</h2></div>
+    <section class="cartao" style="padding-block:4px">
+      <div class="lista lista-ic">
+        <button type="button" id="restaurar"><span data-icone="transferir"></span><span>Restaurar dados de exemplo<br><small class="mudo peq">Volta a garagem, os carros e o histórico para o começo.</small></span><span class="seta" data-icone="seta"></span></button>
+        <button type="button" id="sair" class="sair"><span data-icone="sair"></span>Sair da conta</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  VX.shell('garagem');
+  var d = VX.db(), esc = VX.esc;
+
+  var AJUDA = {
+    motorista: 'Mostramos o custo por km em destaque, para entrar na conta das corridas.',
+    dono: 'Mostramos o gasto do mês e o que está para vencer.'
+  };
+  var NOTIF = [
+    ['revisao', 'Revisão e troca de óleo', 'Avisa por km e por data'],
+    ['documentos', 'IPVA e licenciamento', 'Pelo final da placa, 7 dias antes'],
+    ['interessados', 'Interessados nos meus anúncios', 'Quando alguém chamar no WhatsApp']
+  ];
+
+  function desenhar() {
+    var u = d.usuario;
+    document.getElementById('avatar').textContent = VX.iniciais(u.nome);
+    document.getElementById('nome').textContent = u.nome;
+    document.getElementById('email').textContent = u.email;
+    var desde = VX.parseData((u.desde || VX.isoData(VX.hoje()).slice(0, 7)) + '-01');
+    document.getElementById('desde').textContent = 'Na VEXOcar desde ' + VX.fmt.mesAno(desde) + ' · ' + d.carros.length + (d.carros.length === 1 ? ' carro' : ' carros');
+    document.querySelectorAll('#perfil [data-p]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.p === u.perfil); });
+    document.getElementById('perfil-ajuda').textContent = AJUDA[u.perfil] || '';
+    document.getElementById('n-fav').textContent = d.favoritos.length;
+    document.getElementById('n-anun').textContent = d.meusAnuncios.filter(function (a) { return !a.vendido; }).length;
+  }
+
+  document.getElementById('notif').innerHTML = NOTIF.map(function (n) {
+    return '<label class="switch-linha"><span><strong style="font-weight:500">' + n[1] + '</strong><small>' + n[2] + '</small></span>' +
+      '<span class="switch"><input type="checkbox" data-n="' + n[0] + '"' + (d.notificacoes[n[0]] ? ' checked' : '') + ' aria-label="' + n[1] + '"><span></span></span></label>';
+  }).join('');
+  document.getElementById('notif').addEventListener('change', function (e) {
+    var i = e.target.closest('[data-n]');
+    if (!i) return;
+    d.notificacoes[i.dataset.n] = i.checked;
+    VX.salvar(d);
+    VX.toast(i.checked ? 'Notificação ligada.' : 'Notificação desligada.');
+  });
+
+  document.getElementById('perfil').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-p]');
+    if (!b || b.dataset.p === d.usuario.perfil) return;
+    d.usuario.perfil = b.dataset.p;
+    VX.salvar(d); desenhar();
+    VX.toast('Perfil atualizado.');
+  });
+
+  // Meus dados: janela simples para editar nome e e-mail
+  document.getElementById('meus-dados').addEventListener('click', function () {
+    var f = document.createElement('div');
+    f.className = 'janela-fundo';
+    f.innerHTML = '<form class="janela form" role="dialog" aria-modal="true" aria-labelledby="jd" novalidate>' +
+      '<h2 id="jd" style="margin:0">Meus dados</h2>' +
+      '<div class="campo"><label for="j-nome">Nome</label><input id="j-nome" autocomplete="name" value="' + esc(d.usuario.nome) + '"></div>' +
+      '<div class="campo"><label for="j-email">E-mail</label><input id="j-email" type="email" autocomplete="email" value="' + esc(d.usuario.email) + '"></div>' +
+      '<div class="campo"><label for="j-zap">WhatsApp <span class="mudo">(opcional)</span></label><input id="j-zap" type="tel" inputmode="tel" autocomplete="tel" placeholder="(41) 99999-9999" value="' + esc(d.usuario.whatsapp || '') + '">' +
+        '<span class="ajuda">Aparece no botão "Tenho interesse" dos seus anúncios.</span></div>' +
+      '<div class="fila-btn"><button type="button" class="btn btn-s" data-r="0">Cancelar</button><button type="submit" class="btn btn-p">Salvar</button></div></form>';
+    document.body.appendChild(f);
+    requestAnimationFrame(function () { f.classList.add('aberta'); });
+    var form = f.querySelector('form');
+    form.querySelector('#j-nome').focus();
+    function fecha() { f.classList.remove('aberta'); setTimeout(function () { f.remove(); }, 200); }
+    f.addEventListener('click', function (e) { if (e.target === f || e.target.closest('[data-r="0"]')) fecha(); });
+    f.addEventListener('keydown', function (e) { if (e.key === 'Escape') fecha(); });
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var nome = form.querySelector('#j-nome').value.trim(), email = form.querySelector('#j-email').value.trim();
+      var zap = form.querySelector('#j-zap').value.replace(/\D/g, '');
+      if (nome.length < 2 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { VX.toast('Confira o nome e o e-mail.'); return; }
+      if (zap && (zap.length < 10 || zap.length > 13)) { VX.toast('WhatsApp com DDD, ex.: (41) 99999-9999.'); return; }
+      if (zap && zap.length <= 11) zap = '55' + zap; // DDI do Brasil
+      d.usuario.nome = nome; d.usuario.email = email; d.usuario.whatsapp = zap;
+      VX.salvar(d); desenhar(); fecha();
+      VX.toast('Dados salvos.');
+    });
+  });
+
+  document.getElementById('restaurar').addEventListener('click', function () {
+    VX.confirmar('Restaurar dados de exemplo?', 'Tudo o que você cadastrou será trocado pelos carros e históricos de exemplo.', 'Restaurar', true)
+      .then(function (ok) {
+        if (!ok) return;
+        if (VXAPI.ativo) {
+          VX.toast('Restaurando...');
+          VXAPI.restaurarExemplo().then(function () { VX.avisoDepois('Dados de exemplo restaurados.'); location.reload(); },
+            function (e) { VX.toast(e.message); });
+          return;
+        }
+        d = VX.restaurar();
+        VX.avisoDepois('Dados de exemplo restaurados.');
+        location.reload();
+      });
+  });
+
+  document.getElementById('sair').addEventListener('click', function () {
+    if (VXAPI.ativo) { VXAPI.sair().then(function () { location.href = 'entrar.html'; }); return; }
+    d.logado = false;
+    VX.salvar(d);
+    location.href = 'entrar.html';
+  });
+
+  desenhar();
+</script>
+</body>
+</html>

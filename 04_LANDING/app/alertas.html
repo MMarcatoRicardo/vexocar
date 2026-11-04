@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alertas · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  .alerta-c { display: flex; gap: 14px; align-items: flex-start; border-left: 3px solid var(--linha); }
+  .alerta-c.vencido { border-left-color: var(--erro); }
+  .alerta-c.proximo { border-left-color: var(--ambar); }
+  .alerta-c .ic { width: 40px; height: 40px; border-radius: 12px; flex: none; display: grid; place-items: center; background: var(--grafite3); color: var(--off2); }
+  .alerta-c.vencido .ic { background: var(--erro-fundo); color: var(--erro); }
+  .alerta-c.proximo .ic { background: var(--ambar-fundo); color: var(--ambar); }
+  .alerta-c .ic svg { width: 20px; height: 20px; }
+  .alerta-c .corpo { flex: 1; min-width: 0; }
+  .alerta-c .cab { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .alerta-c h3 { font-size: 15px; font-weight: 600; }
+  .alerta-c .acao { margin-top: 10px; display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; }
+  .alerta-c .lido-btn { margin-left: auto; height: 32px; padding: 0 12px; font-size: 13px; }
+  .alerta-c.lido { opacity: .55; transition: opacity var(--t); }
+  .alerta-c.lido:hover { opacity: .85; }
+  .grupo-t { display: flex; align-items: center; gap: 8px; margin: 26px 0 12px; }
+  .grupo-t .n { font-size: 12px; font-weight: 700; color: var(--cinza); }
+  details.em-dia summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; margin: 26px 0 12px; }
+  details.em-dia summary::-webkit-details-marker { display: none; }
+  details.em-dia summary svg { width: 16px; height: 16px; transition: transform var(--t); color: var(--cinza); }
+  details.em-dia[open] summary svg { transform: rotate(90deg); }
+  .rodape-nota { margin-top: 32px; }
+</style>
+</head>
+<!-- Tela 07: Alertas. Tudo que vence: revisão (por km e data), troca de óleo, pneus, IPVA e licenciamento. -->
+<body class="shell">
+<main class="conteudo entra">
+  <header class="topo">
+    <h1>Alertas</h1>
+  </header>
+  <div class="chips" id="filtro" role="group" aria-label="Filtrar por carro"></div>
+  <div id="lista"></div>
+  <p class="mudo peq rodape-nota">Regras de IPVA e licenciamento simplificadas pelo final da placa (Detran-PR). Confira sempre o calendário oficial do ano.</p>
+</main>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  VX.shell('alertas');
+  var d = VX.db(), esc = VX.esc, fmt = VX.fmt;
+  var filtro = 'todos';
+  var ICONE = { revisao: 'chave', oleo: 'chave', pneus: 'velocimetro', licenciamento: 'documento', ipva: 'documento' };
+
+  function cartaoAlerta(a) {
+    var c = VX.carro(d, a.carroId), acao = '';
+    if (a.acao && a.acao.pagar) {
+      acao = '<button class="btn btn-s btn-peq" data-pagar="' + a.id + '" data-icone="check">' + esc(a.acao.txt) + '</button>';
+    } else if (a.acao) {
+      acao = '<a class="link" href="' + a.acao.href + '">' + esc(a.acao.txt) + ' ›</a>';
+    }
+    var podeLer = a.status === 'vencido' || a.status === 'proximo';
+    if (podeLer) acao += '<button class="btn btn-g lido-btn" type="button" data-lido="' + a.id + '" data-icone="' + (a.visto ? 'fechar' : 'check') + '">' + (a.visto ? 'Desmarcar' : 'Marcar como lido') + '</button>';
+    return '<div class="cartao alerta-c ' + a.status + (a.visto ? ' lido' : '') + '">' +
+      '<span class="ic">' + VX.icone(ICONE[a.tipo] || 'alertas') + '</span>' +
+      '<div class="corpo"><div class="cab"><h3>' + esc(a.titulo) + '</h3>' + VX.tagStatus(a.status) + (a.visto ? ' <span class="tag">Lido</span>' : '') + '</div>' +
+      '<p class="mudo peq">' + esc(VX.nomeCurto(c)) + ' · <span class="placa">' + fmt.placa(c.placa) + '</span></p>' +
+      '<p class="peq" style="margin-top:4px;color:var(--off2)">' + esc(a.texto) + '</p>' +
+      (acao ? '<div class="acao">' + acao + '</div>' : '') + '</div></div>';
+  }
+
+  function grupo(titulo, itens) {
+    if (!itens.length) return '';
+    return '<div class="grupo-t"><span class="rotulo">' + titulo + '</span><span class="n">' + itens.length + '</span></div>' +
+      '<div class="grade">' + itens.slice().sort(function (x, y) { return (x.visto ? 1 : 0) - (y.visto ? 1 : 0); }).map(cartaoAlerta).join('') + '</div>';
+  }
+
+  var todos = [];
+  function desenhar() {
+    document.getElementById('filtro').innerHTML = [['todos', 'Todos']].concat(d.carros.map(function (c) { return [c.id, VX.nomeCurto(c)]; }))
+      .map(function (f) { return '<button class="chip" aria-pressed="' + (f[0] === filtro) + '" data-f="' + f[0] + '">' + esc(f[1]) + '</button>'; }).join('');
+
+    if (!d.carros.length) {
+      document.getElementById('lista').innerHTML = '<section class="vazio"><h2>Sem alertas por enquanto</h2><p>Cadastre um carro para receber os lembretes de revisão, IPVA e licenciamento.</p><a class="btn btn-p" href="adicionar-carro.html">Adicionar carro</a></section>';
+      return;
+    }
+    todos = VX.alertas(d);
+    var al = todos.filter(function (a) { return filtro === 'todos' || a.carroId === filtro; });
+
+    var html = '';
+    html += grupo('Vencidos', al.filter(function (a) { return a.status === 'vencido'; }));
+    html += grupo('Próximos', al.filter(function (a) { return a.status === 'proximo'; }));
+    var ok = al.filter(function (a) { return a.status === 'ok' || a.status === 'pago'; });
+    if (ok.length) {
+      html += '<details class="em-dia"><summary>' + VX.icone('seta') + '<span class="rotulo">Em dia</span><span class="n mudo peq">' + ok.length + '</span></summary>' +
+        '<div class="grade">' + ok.map(cartaoAlerta).join('') + '</div></details>';
+    }
+    if (!html) html = '<div class="aviso ok" style="margin-top:20px">' + VX.icone('verificado') + '<span>Nada vencendo. Tudo em dia!</span></div>';
+    document.getElementById('lista').innerHTML = html;
+    document.querySelectorAll('#lista [data-icone]').forEach(function (el) { el.insertAdjacentHTML('afterbegin', VX.icone(el.dataset.icone)); el.removeAttribute('data-icone'); });
+  }
+
+  // Janela para registrar o pagamento (pede o valor)
+  function pedirValor(a) {
+    var c = VX.carro(d, a.carroId);
+    var f = document.createElement('div');
+    f.className = 'janela-fundo';
+    f.innerHTML = '<form class="janela" role="dialog" aria-modal="true" aria-labelledby="jt">' +
+      '<h2 id="jt">' + esc(a.titulo) + ' pago</h2><p>' + esc(VX.nomeCurto(c)) + '. O pagamento entra na linha do tempo do carro e o alerta some.</p>' +
+      '<div class="campo" style="margin-bottom:18px"><label for="valor-pago">Valor pago (R$)</label><input id="valor-pago" inputmode="decimal" placeholder="0,00" required></div>' +
+      '<div class="fila-btn"><button type="button" class="btn btn-s" data-r="0">Cancelar</button><button type="submit" class="btn btn-p">Marcar como pago</button></div></form>';
+    document.body.appendChild(f);
+    requestAnimationFrame(function () { f.classList.add('aberta'); });
+    var inp = f.querySelector('input'); inp.focus();
+    function fecha() { f.classList.remove('aberta'); setTimeout(function () { f.remove(); }, 200); }
+    f.addEventListener('click', function (e) { if (e.target === f || e.target.closest('[data-r="0"]')) fecha(); });
+    f.querySelector('form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = parseFloat(inp.value.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')) || 0;
+      VX.registrarPagamento(d, a.acao.pagar.carroId, a.acao.pagar.tipo, a.acao.pagar.ano, v);
+      VX.salvar(d);
+      fecha();
+      desenhar(); VX.atualizarBolinha();
+      VX.toast(a.titulo + ' marcado como pago.');
+    });
+  }
+
+  document.getElementById('filtro').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-f]'); if (!b) return;
+    filtro = b.dataset.f; desenhar();
+  });
+  document.getElementById('lista').addEventListener('click', function (e) {
+    var l = e.target.closest('[data-lido]');
+    if (l) {
+      var al = todos.filter(function (x) { return x.id === l.dataset.lido; })[0];
+      VX.marcarVisto(d, l.dataset.lido, !al.visto);
+      VX.salvar(d); desenhar(); VX.atualizarBolinha();
+      VX.toast(al.visto ? 'Alerta marcado como não lido.' : 'Alerta marcado como lido.');
+      return;
+    }
+    var b = e.target.closest('[data-pagar]'); if (!b) return;
+    var a = todos.filter(function (x) { return x.id === b.dataset.pagar; })[0];
+    if (a) pedirValor(a);
+  });
+
+  desenhar();
+</script>
+</body>
+</html>

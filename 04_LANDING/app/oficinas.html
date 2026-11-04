@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oficinas próximas · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  .ofi-barra { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+  .ofi-busca { display: flex; gap: 8px; }
+  .ofi-busca .campo { flex: 1; }
+  .ofi-busca .campo input { padding-left: 42px; }
+  .ofi-busca .campo { position: relative; }
+  .ofi-busca .campo svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--cinza); pointer-events: none; }
+  .ofi-grid { display: grid; gap: 14px; }
+  .mapa-box { position: relative; height: 55vh; min-height: 300px; border-radius: var(--r-g); overflow: hidden; border: 1px solid var(--linha); background: var(--grafite2); }
+  #mapa { position: absolute; inset: 0; }
+  .ofi-lista { display: flex; flex-direction: column; gap: 10px; }
+  .ofi-lista .qtd { font-size: 13px; color: var(--cinza); }
+  @media (max-width: 959px) {
+    .ofi-lista { margin-top: -34px; position: relative; z-index: 5; background: var(--grafite); border: 1px solid var(--linha); border-radius: 22px 22px 0 0; padding: 10px 12px 12px; }
+    .ofi-lista::before { content: ""; display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--linha); margin: 0 auto 6px; }
+  }
+  @media (min-width: 960px) {
+    .ofi-grid { grid-template-columns: 380px minmax(0, 1fr); height: calc(100vh - 210px); min-height: 520px; }
+    .ofi-grid .mapa-box { order: 2; height: auto; }
+    .ofi-lista { order: 1; overflow-y: auto; padding-right: 4px; }
+  }
+  .ofi-item { display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%; padding: 14px; border-radius: 16px; border: 1px solid var(--linha); background: var(--grafite2); transition: border-color var(--t), background var(--t); cursor: pointer; }
+  .ofi-item:hover { border-color: var(--cinza); }
+  .ofi-item.sel { border-color: var(--verde); background: var(--verde-fundo); }
+  .ofi-item .pin-mini { width: 34px; height: 34px; flex: none; border-radius: 10px; display: grid; place-items: center; background: var(--grafite3); color: var(--cinza); }
+  .ofi-item .pin-mini.p { background: var(--verde-fundo); color: var(--verde); }
+  .ofi-item .pin-mini svg { width: 18px; height: 18px; }
+  .ofi-item .inf { flex: 1; min-width: 0; }
+  .ofi-item h3 { font-size: 15px; font-weight: 600; }
+  .ofi-item .lin { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
+  .ofi-item .dir { text-align: right; flex: none; }
+  .ofi-item .dir strong { display: block; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .ofi-item .ver { font-size: 13px; font-weight: 600; color: var(--verde); }
+  .ofi-nota { font-size: 12px; color: var(--cinza); margin-top: 12px; }
+
+  /* Mapa escuro (filtro nas imagens do OpenStreetMap) */
+  .leaflet-container { background: #1b1d21; font-family: var(--texto); }
+  .leaflet-tile-pane { filter: brightness(1.1); }
+  .leaflet-control-attribution { background: rgba(14, 15, 17, .8) !important; color: var(--cinza) !important; font-size: 10px; }
+  .leaflet-control-attribution a { color: var(--off2) !important; }
+  .leaflet-bar a { background: var(--grafite2) !important; color: var(--off) !important; border-color: var(--linha) !important; }
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--grafite2); color: var(--off); border: 1px solid var(--linha); box-shadow: 0 10px 30px rgba(0, 0, 0, .5); }
+  .leaflet-popup-content { margin: 12px 14px; font-size: 13px; line-height: 1.4; }
+  .leaflet-popup-content strong { font-size: 14px; }
+  .leaflet-popup-content a { color: var(--verde); font-weight: 600; }
+  .leaflet-container a.leaflet-popup-close-button { color: var(--cinza); }
+  .pin { width: 34px; height: 34px; border-radius: 50% 50% 50% 4px; transform: rotate(-45deg); display: grid; place-items: center; background: var(--grafite3); border: 2px solid var(--cinza); box-shadow: 0 6px 16px rgba(0, 0, 0, .5); transition: transform var(--t); }
+  .pin > * { transform: rotate(45deg); }
+  .pin svg { width: 16px; height: 15px; }
+  .pin.p { background: var(--grafite); border-color: var(--verde); }
+  .pin.sel { transform: rotate(-45deg) scale(1.25); }
+  .voce { width: 18px; height: 18px; border-radius: 50%; background: #4A9EFF; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(74, 158, 255, .25); }
+  .sem-mapa { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--cinza); }
+  .sem-mapa svg { width: 32px; height: 32px; margin: 0 auto 8px; display: block; }
+</style>
+</head>
+<!-- Tela 12 do wireframe: Oficinas próximas (mapa + lista). -->
+<body class="shell">
+<main class="conteudo entra">
+  <header class="topo">
+    <h1>Oficinas</h1>
+    <div class="acoes-topo"><button class="btn btn-s btn-peq" id="perto" type="button" data-icone="loc">Perto de mim</button></div>
+  </header>
+
+  <div class="ofi-barra">
+    <div class="ofi-busca">
+      <div class="campo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="busca" type="search" placeholder="Buscar serviço: freios, pneus, óleo…" aria-label="Buscar por serviço ou nome">
+      </div>
+    </div>
+    <div class="chips" id="filtros" role="group" aria-label="Filtrar oficinas">
+      <button class="chip" data-f="todas" aria-pressed="true">Todas</button>
+      <button class="chip" data-f="abertas" aria-pressed="false">Abertas agora</button>
+    </div>
+  </div>
+
+  <div class="ofi-grid">
+    <div class="mapa-box"><div id="mapa" aria-label="Mapa das oficinas"></div></div>
+    <section class="ofi-lista" aria-label="Lista de oficinas">
+      <p class="qtd" id="qtd"></p>
+      <div id="lista" class="grade" style="gap:10px"></div>
+      <p class="ofi-nota">Na versão final, as oficinas vêm do OpenStreetMap perto de você; estas são de exemplo.</p>
+    </section>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  VX.shell('oficinas');
+  var d = VX.db(), esc = VX.esc;
+  var eu = { lat: -25.4284, lng: -49.2733 }; // Centro de Curitiba
+  var filtro = 'todas', termo = '', selecionada = null;
+
+  function distancia(a, b) {
+    var R = 6371, rad = Math.PI / 180;
+    var dLat = (b.lat - a.lat) * rad, dLng = (b.lng - a.lng) * rad;
+    var x = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return 2 * R * Math.asin(Math.sqrt(x));
+  }
+  function fmtDist(km) { return km < 1 ? Math.round(km * 1000) + ' m' : km.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' km'; }
+  // Aberta agora: seg a sáb, das 8h até o horário de fechar (hora real do navegador)
+  function aberta(o) {
+    var a = new Date(), h = a.getHours() + a.getMinutes() / 60;
+    return a.getDay() !== 0 && h >= 8 && h < o.fecha;
+  }
+  function semAcento(s) { return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+
+  function visiveis() {
+    var t = semAcento(termo);
+    return d.oficinas.map(function (o) { return Object.assign({ km: distancia(eu, o) }, o); })
+      .filter(function (o) {
+        if (filtro === 'abertas' && !aberta(o)) return false;
+        if (t && semAcento(o.nome + ' ' + o.especialidade + ' ' + o.servicos.join(' ')).indexOf(t) < 0) return false;
+        return true;
+      })
+      .sort(function (a, b) { return a.km - b.km; });
+  }
+
+  // ---------- Mapa ----------
+  var mapa = null, marcadores = {}, marcaEu = null;
+  var V_PIN = '<svg viewBox="18 20 84 80"><polygon points="18,20 37,20 60,78 60,100 50,100" fill="#F2F1EC"/><polygon points="83,20 102,20 70,100 60,100 60,78" fill="#2FD47A"/></svg>';
+  function iconeOficina(o, sel) {
+    return L.divIcon({ className: '', iconSize: [34, 34], iconAnchor: [4, 34], popupAnchor: [13, -30],
+      html: '<div class="pin p' + (sel ? ' sel' : '') + '">' + V_PIN + '</div>' });
+  }
+  if (window.L) {
+    mapa = L.map('mapa', { zoomControl: true, attributionControl: true }).setView([eu.lat, eu.lng], 13);
+    // Mapa escuro da Esri: funciona aberto direto do computador (file://); OpenStreetMap e CARTO bloqueiam esse caso.
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 16, attribution: 'Mapa &copy; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+    }).addTo(mapa);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(mapa);
+    marcaEu = L.marker([eu.lat, eu.lng], { icon: L.divIcon({ className: '', iconSize: [18, 18], html: '<div class="voce" title="Você"></div>' }), zIndexOffset: 1000 })
+      .addTo(mapa).bindTooltip('Você');
+  } else {
+    document.querySelector('.mapa-box').insertAdjacentHTML('beforeend',
+      '<div class="sem-mapa"><div>' + VX.icone('mapa') + '<strong style="color:var(--off)">Mapa indisponível sem internet</strong><br>A lista abaixo continua funcionando.</div></div>');
+    document.querySelector('.mapa-box').style.height = '160px';
+  }
+
+  function desenhar() {
+    var lista = visiveis();
+    document.getElementById('qtd').textContent = lista.length + (lista.length === 1 ? ' oficina' : ' oficinas') + ' perto de você';
+    document.getElementById('lista').innerHTML = lista.length ? lista.map(function (o) {
+      var ab = aberta(o);
+      return '<div class="ofi-item' + (o.id === selecionada ? ' sel' : '') + '" data-id="' + o.id + '" role="button" tabindex="0">' +
+        '<span class="pin-mini p">' + VX.icone('oficina') + '</span>' +
+        '<div class="inf"><h3>' + esc(o.nome) + '</h3><p class="mudo peq">' + esc(o.especialidade) + '</p>' +
+        '<div class="lin">' +
+        '<span class="tag ' + (ab ? 'tag-v' : '') + '">' + (ab ? 'Aberta agora' : 'Fechada') + '</span></div></div>' +
+        '<div class="dir"><strong>' + fmtDist(o.km) + '</strong><span class="mudo peq" title="' + VX.notaOficina(d, o).total + ' avaliações">★ ' + VX.notaOficina(d, o).media.toLocaleString('pt-BR') + ' · ' + VX.notaOficina(d, o).total + '</span><br>' +
+        '<a class="ver" href="oficina.html?id=' + o.id + '">Ver ›</a></div></div>';
+    }).join('') : '<div class="cartao centro mudo">Nenhuma oficina com esse filtro.</div>';
+
+    if (mapa) {
+      Object.keys(marcadores).forEach(function (k) { mapa.removeLayer(marcadores[k]); });
+      marcadores = {};
+      lista.forEach(function (o) {
+        marcadores[o.id] = L.marker([o.lat, o.lng], { icon: iconeOficina(o, o.id === selecionada) }).addTo(mapa)
+          .bindPopup('<strong>' + esc(o.nome) + '</strong><br>' + esc(o.especialidade) + ' · ★ ' + VX.notaOficina(d, o).media.toLocaleString('pt-BR') + ' (' + VX.notaOficina(d, o).total + ' avaliações)' +
+            '<br>' + fmtDist(o.km) + ' · <a href="oficina.html?id=' + o.id + '">Ver oficina ›</a>')
+          .on('click', function () { selecionar(o.id, false); });
+      });
+    }
+  }
+
+  function selecionar(id, centralizar) {
+    selecionada = id;
+    desenhar();
+    if (mapa && marcadores[id]) {
+      if (centralizar) mapa.setView(marcadores[id].getLatLng(), 15, { animate: true });
+      marcadores[id].openPopup();
+    }
+    var item = document.querySelector('.ofi-item[data-id="' + id + '"]');
+    if (item && !centralizar) item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  document.getElementById('lista').addEventListener('click', function (e) {
+    if (e.target.closest('a')) return;
+    var it = e.target.closest('.ofi-item');
+    if (!it) return;
+    selecionar(it.dataset.id, true);
+    if (window.innerWidth < 960) document.querySelector('.mapa-box').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  document.getElementById('lista').addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var it = e.target.closest('.ofi-item');
+    if (it) { e.preventDefault(); selecionar(it.dataset.id, true); }
+  });
+  document.getElementById('filtros').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-f]');
+    if (!b) return;
+    filtro = b.dataset.f;
+    document.querySelectorAll('#filtros .chip').forEach(function (c) { c.setAttribute('aria-pressed', c === b); });
+    desenhar();
+  });
+  document.getElementById('busca').addEventListener('input', function (e) { termo = e.target.value.trim(); desenhar(); });
+
+  document.getElementById('perto').addEventListener('click', function () {
+    if (!navigator.geolocation) { VX.toast('Seu navegador não informa a localização.'); return; }
+    VX.toast('Procurando sua localização…');
+    navigator.geolocation.getCurrentPosition(function (p) {
+      eu = { lat: p.coords.latitude, lng: p.coords.longitude };
+      if (mapa) { marcaEu.setLatLng([eu.lat, eu.lng]); mapa.setView([eu.lat, eu.lng], 13); }
+      desenhar();
+      VX.toast('Distâncias calculadas a partir de você.');
+    }, function () { VX.toast('Sem permissão de localização. Usando o Centro de Curitiba.'); }, { timeout: 8000 });
+  });
+
+  desenhar();
+</script>
+</body>
+</html>

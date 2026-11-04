@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gastos · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  .filtros { display: flex; flex-direction: column; gap: 10px; }
+  @media (min-width: 960px) { .filtros { flex-direction: row; align-items: center; justify-content: space-between; } }
+  .inclui { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--off2); }
+  .inclui .switch { margin-left: 0; }
+  .kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 18px; }
+  @media (min-width: 960px) { .kpis { grid-template-columns: repeat(4, 1fr); } }
+  .kpis > .cartao, .duas-col > .cartao { margin-top: 0; }
+  .kpi strong { font-size: 22px; }
+  @media (min-width: 960px) { .kpi strong { font-size: 26px; } }
+  .kpi.destaque { border-color: rgba(47, 212, 122, .4); }
+  .kpi.destaque strong { color: var(--verde); }
+  /* gráfico de barras por mês */
+  .barras { display: flex; align-items: flex-end; gap: 6px; height: 200px; padding: 22px 10px 0; overflow-x: auto; scrollbar-width: none; }
+  .barras::-webkit-scrollbar { display: none; }
+  .bar { flex: 1 0 28px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 6px; position: relative; }
+  .bar i { display: block; width: 100%; max-width: 40px; border-radius: 6px 6px 2px 2px; background: #3A3E45; min-height: 2px; transition: background var(--t), height .5s cubic-bezier(.2, .7, .2, 1); }
+  .bar.atual i { background: var(--verde); }
+  .bar:hover i { background: #5D6169; }
+  .bar.atual:hover i { background: #4BE08F; }
+  .bar .val { position: absolute; top: -2px; font-size: 11px; font-weight: 600; color: var(--off2); white-space: nowrap; opacity: 0; transition: opacity var(--t); font-variant-numeric: tabular-nums; }
+  .bar.maior .val, .bar.atual .val, .bar:hover .val { opacity: 1; }
+  .bar .mes { font-size: 11px; color: var(--cinza); }
+  .bar.atual .mes { color: var(--verde); font-weight: 600; }
+  /* categorias */
+  .cat { display: grid; grid-template-columns: 110px 1fr auto; align-items: center; gap: 12px; padding: 8px 0; }
+  .cat .trilho { height: 10px; border-radius: 5px; background: var(--grafite3); overflow: hidden; }
+  .cat .trilho i { display: block; height: 100%; border-radius: 5px; background: #5D6169; }
+  .cat.top .trilho i { background: var(--verde); }
+  .cat .v { text-align: right; font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .cat .v small { color: var(--cinza); margin-left: 6px; }
+  @media (max-width: 420px) { .cat { grid-template-columns: 86px 1fr auto; gap: 8px; } }
+  .maior-item { display: flex; align-items: center; gap: 12px; }
+  .maior-item .v { margin-left: auto; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+</style>
+</head>
+<!-- Tela 14: Painel de gastos. Total, custo por km (importante para motorista de app) e divisão por categoria. -->
+<body class="shell">
+<main class="conteudo entra">
+  <header class="topo"><h1>Gastos</h1></header>
+
+  <div id="painel">
+    <div class="filtros">
+      <div class="chips" id="f-carro" role="group" aria-label="Carro"></div>
+      <div class="chips" id="f-periodo" role="group" aria-label="Período"></div>
+    </div>
+    <label class="inclui" style="margin-top:12px"><span class="switch"><input type="checkbox" id="f-docs"><span></span></span>Incluir IPVA e licenciamento</label>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div class="duas-col" style="margin-top:14px">
+      <div class="cartao">
+        <div class="secao-t" style="margin-top:0"><h2>Por mês</h2><span class="mudo peq" id="bar-legenda"></span></div>
+        <div class="barras" id="barras" role="img"></div>
+      </div>
+      <div class="cartao">
+        <div class="secao-t" style="margin-top:0"><h2>Por categoria</h2></div>
+        <div id="cats"></div>
+      </div>
+    </div>
+
+    <div class="secao-t"><h2>Maiores gastos</h2></div>
+    <div class="cartao"><div class="lista" id="maiores"></div></div>
+  </div>
+
+  <section class="vazio" id="vazio" hidden>
+    <h2>Ainda não há gastos</h2>
+    <p>Registre as manutenções do seu carro para ver quanto ele custa por mês e por km.</p>
+    <a class="btn btn-p" href="nova-manutencao.html" data-icone="mais">Registrar manutenção</a>
+  </section>
+</main>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  VX.shell('gastos');
+  var d = VX.db(), esc = VX.esc, fmt = VX.fmt;
+  var MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  var carroSel = 'todos', periodo = 6;
+
+  function compacto(v) { return v >= 1000 ? 'R$ ' + (v / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mil' : 'R$ ' + Math.round(v); }
+
+  if (!d.manutencoes.length && !(d.pagamentos || []).length) {
+    document.getElementById('painel').hidden = true;
+    document.getElementById('vazio').hidden = false;
+  } else desenhar();
+
+  function itens() {
+    var docs = document.getElementById('f-docs').checked;
+    var ms = d.manutencoes.map(function (m) { return { data: m.data, valor: m.valor, cat: m.tipo, titulo: m.servico, carroId: m.carroId }; });
+    var ps = docs ? (d.pagamentos || []).map(function (p) { return { data: p.data, valor: p.valor, cat: 'impostos', titulo: VX.NOME_DOC[p.tipo] + ' ' + p.ano, carroId: p.carroId }; }) : [];
+    return ms.concat(ps).filter(function (i) { return carroSel === 'todos' || i.carroId === carroSel; });
+  }
+
+  function desenhar() {
+    document.getElementById('f-carro').innerHTML = [['todos', 'Todos']].concat(d.carros.map(function (c) { return [c.id, VX.nomeCurto(c)]; }))
+      .map(function (f) { return '<button class="chip" aria-pressed="' + (f[0] === carroSel) + '" data-c="' + f[0] + '">' + esc(f[1]) + '</button>'; }).join('');
+    document.getElementById('f-periodo').innerHTML = [[6, '6 meses'], [12, '12 meses'], [0, 'Tudo']]
+      .map(function (f) { return '<button class="chip" aria-pressed="' + (f[0] === periodo) + '" data-p="' + f[0] + '">' + f[1] + '</button>'; }).join('');
+
+    var hoje = VX.hoje(), todos = itens();
+    // meses do período (do mais antigo ao atual)
+    var nMeses = periodo;
+    if (!periodo) {
+      var maisAntigo = todos.reduce(function (m, i) { return i.data < m ? i.data : m; }, VX.isoData(hoje));
+      var a = VX.parseData(maisAntigo);
+      nMeses = (hoje.getFullYear() - a.getFullYear()) * 12 + hoje.getMonth() - a.getMonth() + 1;
+    }
+    var meses = [];
+    for (var k = nMeses - 1; k >= 0; k--) {
+      var dm = new Date(hoje.getFullYear(), hoje.getMonth() - k, 1);
+      meses.push({ chave: VX.isoData(dm).slice(0, 7), rot: MES[dm.getMonth()] + (dm.getMonth() === 0 || k === nMeses - 1 ? '/' + String(dm.getFullYear()).slice(2) : ''), total: 0 });
+    }
+    var inicio = meses[0].chave;
+    var lista = todos.filter(function (i) { return i.data.slice(0, 7) >= inicio; });
+    lista.forEach(function (i) { var m = meses.filter(function (x) { return x.chave === i.data.slice(0, 7); })[0]; if (m) m.total += i.valor; });
+
+    var total = lista.reduce(function (s, i) { return s + i.valor; }, 0);
+    var carrosF = d.carros.filter(function (c) { return carroSel === 'todos' || c.id === carroSel; });
+    var kmRodado = carrosF.reduce(function (s, c) { return s + c.kmMes * nMeses; }, 0);
+    var porKm = kmRodado ? total / kmRodado : 0;
+    var maior = lista.slice().sort(function (a, b) { return b.valor - a.valor; })[0];
+    var motorista = d.usuario.perfil === 'motorista';
+
+    document.getElementById('kpis').innerHTML =
+      '<div class="cartao kpi"><span class="rotulo">Total no período</span><strong>' + fmt.moedaCheia(total) + '</strong><small>' + nMeses + (nMeses === 1 ? ' mês' : ' meses') + '</small></div>' +
+      '<div class="cartao kpi"><span class="rotulo">Média por mês</span><strong>' + fmt.moedaCheia(total / nMeses) + '</strong><small>' + lista.length + ' lançamentos</small></div>' +
+      '<div class="cartao kpi' + (motorista ? ' destaque' : '') + '"><span class="rotulo">Custo por km</span><strong>' + fmt.moedaCheia(porKm) + '</strong><small>' +
+        (motorista ? 'para o motorista de app, entra na conta da corrida' : '≈ ' + fmt.km(kmRodado) + ' rodados no período') + '</small></div>' +
+      '<div class="cartao kpi"><span class="rotulo">Maior gasto</span><strong>' + (maior ? fmt.moedaCheia(maior.valor) : '—') + '</strong><small>' + (maior ? esc(maior.titulo) : 'nenhum no período') + '</small></div>';
+
+    // barras por mês
+    var max = Math.max.apply(null, meses.map(function (m) { return m.total; }).concat([1]));
+    var iMaior = meses.reduce(function (b, m, i) { return m.total > meses[b].total ? i : b; }, 0);
+    document.getElementById('barras').innerHTML = meses.map(function (m, i) {
+      var cls = 'bar' + (i === meses.length - 1 ? ' atual' : '') + (i === iMaior && m.total ? ' maior' : '');
+      return '<div class="' + cls + '" title="' + m.rot + ': ' + fmt.moedaCheia(m.total) + '"><span class="val">' + (m.total ? compacto(m.total) : '') + '</span>' +
+        '<i style="height:' + (m.total / max * 150) + 'px"></i><span class="mes">' + m.rot + '</span></div>';
+    }).join('');
+    document.getElementById('barras').setAttribute('aria-label', 'Gastos por mês: ' + meses.map(function (m) { return m.rot + ' ' + fmt.moedaCheia(m.total); }).join(', '));
+    document.getElementById('bar-legenda').textContent = 'verde = mês atual';
+
+    // por categoria
+    var nomes = Object.assign({}, VX.NOME_TIPO, { impostos: 'Impostos' });
+    var cats = {};
+    lista.forEach(function (i) { cats[i.cat] = (cats[i.cat] || 0) + i.valor; });
+    var ordem = Object.keys(cats).sort(function (a, b) { return cats[b] - cats[a]; });
+    var maxC = ordem.length ? cats[ordem[0]] : 1;
+    document.getElementById('cats').innerHTML = ordem.length ? ordem.map(function (k, i) {
+      return '<div class="cat' + (i === 0 ? ' top' : '') + '"><span>' + nomes[k] + '</span><span class="trilho"><i style="width:' + (cats[k] / maxC * 100) + '%"></i></span>' +
+        '<span class="v">' + fmt.moedaCheia(cats[k]) + '<small>' + Math.round(cats[k] / total * 100) + '%</small></span></div>';
+    }).join('') : '<p class="mudo">Nenhum gasto no período.</p>';
+
+    // maiores gastos
+    document.getElementById('maiores').innerHTML = lista.slice().sort(function (a, b) { return b.valor - a.valor; }).slice(0, 5).map(function (i) {
+      var c = VX.carro(d, i.carroId);
+      return '<div class="maior-item"><div><strong>' + esc(i.titulo) + '</strong><p class="mudo peq">' + fmt.data(i.data) + ' · ' + esc(c ? VX.nomeCurto(c) : '') + ' · ' + nomes[i.cat] + '</p></div>' +
+        '<span class="v">' + fmt.moedaCheia(i.valor) + '</span></div>';
+    }).join('') || '<p class="mudo">Nenhum gasto no período.</p>';
+  }
+
+  document.getElementById('f-carro').addEventListener('click', function (e) { var b = e.target.closest('[data-c]'); if (b) { carroSel = b.dataset.c; desenhar(); } });
+  document.getElementById('f-periodo').addEventListener('click', function (e) { var b = e.target.closest('[data-p]'); if (b) { periodo = +b.dataset.p; desenhar(); } });
+  document.getElementById('f-docs').addEventListener('change', desenhar);
+</script>
+</body>
+</html>

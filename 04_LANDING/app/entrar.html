@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  .esqueci { align-self: flex-end; font-size: 13px; margin-top: -8px; }
+  .demo { margin-top: 16px; }
+</style>
+</head>
+<!-- Tela 02: Login. Google ou e-mail e senha (Firebase Auth na etapa 7). O link de baixo leva ao perfil oficina. -->
+<body>
+<div class="auth">
+  <div class="auth-foto" aria-hidden="true">
+    <img src="../img/hero.jpg" alt="">
+    <blockquote>O prontuário digital do seu carro.<small>Revisões, impostos e histórico num lugar só.</small></blockquote>
+  </div>
+
+  <main class="auth-form entra">
+    <a class="wm" href="../index.html" aria-label="VEXOcar, voltar ao site"><svg><use href="#v"/></svg>EXO<span>car</span></a>
+    <h1>Bem-vindo de volta</h1>
+    <p class="sub">Entre para ver sua garagem e os alertas do seu carro.</p>
+
+    <form class="form" id="form" novalidate>
+      <button class="btn btn-google btn-bloco" type="button" id="google"></button>
+      <div class="ou">ou</div>
+      <div class="campo">
+        <label for="email">E-mail</label>
+        <input id="email" type="email" autocomplete="email" placeholder="voce@email.com" required>
+      </div>
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <div class="campo-senha">
+          <input id="senha" type="password" autocomplete="current-password" placeholder="Sua senha" required>
+          <button type="button" aria-label="Mostrar senha"></button>
+        </div>
+      </div>
+      <a class="link esqueci" href="esqueci-senha.html">Esqueci a senha</a>
+      <button class="btn btn-p btn-bloco" type="submit">Entrar</button>
+      <p class="centro mudo">Não tem conta? <a class="link" href="criar-conta.html" id="link-criar">Criar conta</a></p>
+    </form>
+
+    <div class="aviso demo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span class="peq">Versão de demonstração: qualquer e-mail e senha com 6 caracteres ou mais entram na conta de exemplo.</span>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  VX.simbolo();
+  document.getElementById('google').innerHTML = VX.iconeGoogle() + 'Entrar com Google';
+
+  function marcaErro(id, msg) {
+    var campo = document.getElementById(id).closest('.campo');
+    campo.classList.toggle('erro', !!msg);
+    var m = campo.querySelector('.msg-erro');
+    if (msg) {
+      if (!m) { m = document.createElement('span'); m.className = 'msg-erro'; campo.appendChild(m); }
+      m.textContent = msg;
+    } else if (m) m.remove();
+    return !msg;
+  }
+
+  function irPara(d) {
+    VX.avisoDepois('Bem-vindo, ' + d.usuario.nome.split(' ')[0] + '!');
+    // ?ir=vitrine.html (vem da landing): depois de entrar, segue para lá. Só aceita telas do próprio app.
+    var ir = VX.param('ir');
+    location.href = ir && /^[a-z-]+\.html$/.test(ir) ? ir : 'garagem.html';
+  }
+
+  // Aviso embaixo do formulário: na demonstração explica o modo; com a API mostra o erro do login.
+  var aviso = document.querySelector('.aviso.demo');
+  if (VXAPI.ativo) aviso.style.display = 'none';
+  function mostrarErro(msg) {
+    aviso.classList.add('erro');
+    aviso.querySelector('span').textContent = msg;
+    aviso.style.display = '';
+  }
+
+  // Modo API: login de verdade (Firebase ou o login local da API). Demonstração: entra na conta de exemplo.
+  function entrar(email, senha, comGoogle) {
+    if (!VXAPI.ativo) { var d = VX.db(); d.logado = true; VX.salvar(d); return irPara(d); }
+    var btn = comGoogle ? document.getElementById('google') : document.querySelector('#form [type=submit]');
+    var txt = btn.innerHTML;
+    btn.disabled = true;
+    if (!comGoogle) btn.textContent = 'Entrando...';
+    aviso.style.display = 'none';
+    (comGoogle ? VXAPI.google() : VXAPI.entrar(email, senha)).then(irPara, function (e) {
+      btn.disabled = false; btn.innerHTML = txt;
+      mostrarErro(e.message);
+    });
+  }
+
+  document.getElementById('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = document.getElementById('email').value.trim();
+    var senha = document.getElementById('senha').value;
+    var ok = marcaErro('email', !email ? 'Digite seu e-mail.' : (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? '' : 'Esse e-mail não parece válido.'));
+    ok = marcaErro('senha', !senha ? 'Digite sua senha.' : (senha.length < 6 ? 'A senha tem pelo menos 6 caracteres.' : '')) && ok;
+    if (ok) entrar(email, senha);
+    else document.querySelector('.campo.erro input').focus();
+  });
+  ['email', 'senha'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', function () { marcaErro(id, ''); });
+  });
+  document.getElementById('google').addEventListener('click', function () { entrar('', '', true); });
+</script>
+<script>
+  // leva o destino junto se a pessoa preferir criar conta
+  if (VX.param('ir')) document.getElementById('link-criar').href = 'criar-conta.html?ir=' + encodeURIComponent(VX.param('ir'));
+</script>
+</body>
+</html>

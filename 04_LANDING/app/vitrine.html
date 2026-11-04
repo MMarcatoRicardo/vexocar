@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitrine · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  .busca { position: relative; flex: 1; min-width: 0; }
+  .busca svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--cinza); pointer-events: none; }
+  .busca input { padding-left: 42px; }
+  .barra-busca { display: flex; gap: 10px; align-items: flex-end; }
+  .barra-busca .campo select { width: auto; min-width: 180px; }
+  .resultado { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 18px 0 14px; }
+  .anuncio-c { position: relative; }
+  .anuncio-c > .foto { display: block; }
+  .anuncio-c .carro-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .anuncio-c .carro-preco { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .anuncio-c .verde { color: var(--verde); font-weight: 600; }
+  .meu-tag { position: absolute; top: 10px; left: 10px; background: var(--verde); color: var(--grafite); }
+  .meus-acoes { display: flex; gap: 8px; padding: 0 16px 16px; }
+  .meus-acoes .btn { flex: 1; }
+  .rodape-fipe { margin-top: 28px; text-align: center; }
+  @media (max-width: 639px) { .barra-busca { flex-wrap: wrap; } .barra-busca .campo { flex: 1 1 100%; } .barra-busca .campo select { width: 100%; } }
+</style>
+</head>
+<!-- Tela 09 (Vitrine): busca, filtros e anúncios com selo de histórico. Com ?meus=1 vira "Meus anúncios" e com ?fav=1 abre nos favoritos. -->
+<body class="shell">
+<main class="conteudo entra">
+  <header class="topo">
+    <a class="voltar" href="perfil.html" aria-label="Voltar ao perfil" data-icone="voltar" id="voltar" hidden></a>
+    <h1 id="titulo">Vitrine</h1>
+    <div class="acoes-topo">
+      <a class="btn btn-p btn-peq" href="anunciar.html" data-icone="mais"><span class="so-pc">Anunciar meu carro</span><span class="so-celular">Anunciar</span></a>
+    </div>
+  </header>
+  <p class="topo-sub" id="sub">Carros com histórico de manutenção comprovado.</p>
+
+  <div id="controles">
+    <div class="barra-busca">
+      <label class="busca campo"><span class="rotulo-campo" hidden>Buscar</span>
+        <span style="position:relative;display:block">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="q" type="search" placeholder="Buscar marca, modelo ou cidade" aria-label="Buscar marca, modelo ou cidade" autocomplete="off">
+        </span>
+      </label>
+      <div class="campo">
+        <select id="ordem" aria-label="Ordenar">
+          <option value="recentes">Mais recentes</option>
+          <option value="preco">Menor preço</option>
+          <option value="nota">Maior nota de saúde</option>
+          <option value="km">Menor km</option>
+        </select>
+      </div>
+    </div>
+    <div class="chips" id="filtros" role="group" aria-label="Filtros" style="margin-top:14px"></div>
+  </div>
+
+  <div class="resultado"><span class="mudo" id="contador"></span><button class="link" id="limpar" hidden>Limpar filtros</button></div>
+  <div class="grade grade-3" id="lista"></div>
+
+  <section class="vazio" id="vazio" hidden>
+    <h2 id="vazio-t">Nenhum carro encontrado</h2>
+    <p id="vazio-p">Tente outra busca ou tire alguns filtros.</p>
+    <a class="btn btn-s" id="vazio-btn" href="vitrine.html">Ver todos os carros</a>
+  </section>
+
+  <p class="mudo peq rodape-fipe">Valores FIPE de exemplo; na versão final vêm da API pública da tabela FIPE.</p>
+</main>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/vitrine.js"></script>
+<script>
+  VX.shell('vitrine');
+  var d = VX.db(), esc = VX.esc, fmt = VX.fmt;
+  var soMeus = VX.param('meus') === '1';
+
+  var FILTROS = [
+    ['ate60', 'Até R$ 60 mil', function (a) { return a.preco <= 60000; }],
+    ['ate150', 'Até R$ 150 mil', function (a) { return a.preco <= 150000; }],
+    ['hatch', 'Hatch', function (a) { return a.categoria === 'hatch'; }],
+    ['seda', 'Sedã', function (a) { return a.categoria === 'seda'; }],
+    ['suv', 'SUV', function (a) { return a.categoria === 'suv'; }],
+    ['esportivo', 'Esportivo', function (a) { return a.categoria === 'esportivo'; }],
+    ['classico', 'Clássico', function (a) { return a.categoria === 'classico'; }],
+    ['nota80', 'Nota 80+', function (a) { return a.nota >= 80; }],
+    ['fipe', 'Abaixo da FIPE', function (a) { return a.preco < a.fipe; }],
+    ['fav', 'Favoritos', function (a) { return d.favoritos.indexOf(a.id) >= 0; }]
+  ];
+  var ativos = {};
+  if (VX.param('fav') === '1') ativos.fav = true;
+
+  if (soMeus) {
+    document.title = 'Meus anúncios · VEXOcar';
+    document.getElementById('titulo').textContent = 'Meus anúncios';
+    document.getElementById('sub').textContent = 'Os carros que você colocou à venda.';
+    document.getElementById('controles').hidden = true;
+    document.getElementById('voltar').hidden = false;
+  }
+
+  function desenharFiltros() {
+    document.getElementById('filtros').innerHTML = FILTROS.map(function (f) {
+      return '<button class="chip" data-f="' + f[0] + '" aria-pressed="' + !!ativos[f[0]] + '">' +
+        (f[0] === 'fav' ? VX.icone('coracao') : '') + f[1] + '</button>';
+    }).join('');
+  }
+
+  function desenhar() {
+    var lista, q = document.getElementById('q').value.trim().toLowerCase();
+    if (soMeus) {
+      lista = VXV.meus(d);
+    } else {
+      lista = VXV.publicos(d).filter(function (a) {
+        if (q && (a.marca + ' ' + a.modelo + ' ' + a.versao + ' ' + a.cidade).toLowerCase().indexOf(q) < 0) return false;
+        // filtros do mesmo grupo (preço, categoria) somam; grupos diferentes se combinam
+        var grupos = { preco: ['ate60', 'ate150'], cat: ['hatch', 'seda', 'suv', 'esportivo', 'classico'] };
+        for (var g in grupos) {
+          var on = grupos[g].filter(function (k) { return ativos[k]; });
+          if (on.length && !on.some(function (k) { return FILTROS.filter(function (f) { return f[0] === k; })[0][2](a); })) return false;
+        }
+        return ['nota80', 'fipe', 'fav'].every(function (k) {
+          return !ativos[k] || FILTROS.filter(function (f) { return f[0] === k; })[0][2](a);
+        });
+      });
+      var ord = document.getElementById('ordem').value;
+      lista.sort(function (a, b) {
+        if (ord === 'preco') return a.preco - b.preco;
+        if (ord === 'nota') return b.nota - a.nota;
+        if (ord === 'km') return a.km - b.km;
+        return a.publicado < b.publicado ? 1 : -1;
+      });
+    }
+
+    document.getElementById('contador').textContent = lista.length + (lista.length === 1 ? ' carro' : ' carros');
+    document.getElementById('limpar').hidden = soMeus || (!q && !Object.keys(ativos).some(function (k) { return ativos[k]; }));
+
+    document.getElementById('lista').innerHTML = lista.map(function (a) {
+      var html = VXV.cartao(a, d.favoritos.indexOf(a.id) >= 0);
+      if (soMeus) {
+        var status = a.vendido ? '<span class="tag">Vendido</span>' : a.pausado ? '<span class="tag tag-a">Pausado</span>' : '<span class="tag tag-v">Ativo</span>';
+        html = html.replace('</article>', '<div class="meus-acoes"><span style="align-self:center">' + status + '</span>' +
+          '<a class="btn btn-s btn-peq" href="anuncio.html?id=' + a.id + '">Ver</a>' +
+          (a.vendido ? '' : '<a class="btn btn-s btn-peq" href="vendido.html?id=' + a.id + '">Marcar vendido</a>') + '</div></article>');
+      }
+      return html;
+    }).join('');
+
+    var vazio = document.getElementById('vazio');
+    vazio.hidden = lista.length > 0;
+    if (!lista.length && soMeus) {
+      document.getElementById('vazio-t').textContent = 'Você ainda não anunciou nenhum carro';
+      document.getElementById('vazio-p').textContent = 'Anuncie com o histórico que você já registrou: o selo e a nota de saúde vão junto.';
+      var b = document.getElementById('vazio-btn'); b.textContent = 'Anunciar meu carro'; b.href = 'anunciar.html'; b.className = 'btn btn-p';
+    } else if (!lista.length && ativos.fav && Object.keys(ativos).filter(function (k) { return ativos[k]; }).length === 1 && !q) {
+      document.getElementById('vazio-t').textContent = 'Nenhum favorito ainda';
+      document.getElementById('vazio-p').textContent = 'Toque no coração de um anúncio para guardar aqui.';
+    }
+    VX.animarGauges();
+  }
+
+  document.getElementById('filtros').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-f]');
+    if (!b) return;
+    ativos[b.dataset.f] = !ativos[b.dataset.f];
+    desenharFiltros(); desenhar();
+  });
+  document.getElementById('q').addEventListener('input', desenhar);
+  document.getElementById('ordem').addEventListener('change', desenhar);
+  document.getElementById('limpar').addEventListener('click', function () {
+    ativos = {}; document.getElementById('q').value = ''; desenharFiltros(); desenhar();
+  });
+  document.getElementById('lista').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-fav]');
+    if (!b) return;
+    e.preventDefault();
+    var id = b.dataset.fav, i = d.favoritos.indexOf(id);
+    if (i >= 0) d.favoritos.splice(i, 1); else d.favoritos.push(id);
+    VX.salvar(d);
+    VX.toast(i >= 0 ? 'Tirado dos favoritos' : 'Guardado nos favoritos');
+    if (ativos.fav) desenhar();
+    else {
+      var on = i < 0;
+      b.classList.toggle('ativo', on);
+      b.setAttribute('aria-pressed', on);
+      b.setAttribute('aria-label', on ? 'Tirar dos favoritos' : 'Favoritar');
+    }
+  });
+
+  desenharFiltros();
+  desenhar();
+</script>
+</body>
+</html>

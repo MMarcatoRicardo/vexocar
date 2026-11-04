@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Criar conta · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  .forca { display: flex; gap: 4px; margin-top: 2px; }
+  .forca i { flex: 1; height: 4px; border-radius: 2px; background: var(--linha); transition: background var(--t); }
+  .forca[data-n="1"] i:nth-child(-n+1) { background: var(--erro); }
+  .forca[data-n="2"] i:nth-child(-n+2) { background: var(--ambar); }
+  .forca[data-n="3"] i:nth-child(-n+3) { background: var(--verde); }
+  .perfil-chips .chip { flex: 1 1 0; justify-content: center; height: 44px; }
+  .check.erro { color: var(--erro); }
+</style>
+</head>
+<!-- Tela 15: Criar conta. "Você é" vem da pesquisa: motorista de app vê o custo por km em destaque. Leva à garagem vazia (tela 17). -->
+<body>
+<div class="auth">
+  <div class="auth-foto" aria-hidden="true">
+    <img src="../img/garagem.jpg" alt="">
+    <blockquote>Seu carro tem memória. Agora ela cabe no bolso.<small>Crie a conta e cadastre o primeiro carro em 1 minuto.</small></blockquote>
+  </div>
+
+  <main class="auth-form entra">
+    <a class="wm" href="../index.html" aria-label="VEXOcar, voltar ao site"><svg><use href="#v"/></svg>EXO<span>car</span></a>
+    <h1>Criar conta</h1>
+    <p class="sub">Grátis. Sem cartão de crédito.</p>
+
+    <form class="form" id="form" novalidate>
+      <button class="btn btn-google btn-bloco" type="button" id="google"></button>
+      <div class="ou">ou</div>
+      <div class="campo">
+        <label for="nome">Nome</label>
+        <input id="nome" autocomplete="name" placeholder="Seu nome" required>
+      </div>
+      <div class="campo">
+        <label for="email">E-mail</label>
+        <input id="email" type="email" autocomplete="email" placeholder="voce@email.com" required>
+      </div>
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <div class="campo-senha">
+          <input id="senha" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" required>
+          <button type="button" aria-label="Mostrar senha"></button>
+        </div>
+        <div class="forca" id="forca" data-n="0" aria-hidden="true"><i></i><i></i><i></i></div>
+        <span class="ajuda" id="forca-txt">Use letras e números.</span>
+      </div>
+      <div class="campo">
+        <span class="rotulo-campo" id="perfil-rot">Você é</span>
+        <div class="chips perfil-chips" role="group" aria-labelledby="perfil-rot" id="perfil">
+          <button type="button" class="chip" data-p="motorista" aria-pressed="true">Motorista de app</button>
+          <button type="button" class="chip" data-p="dono" aria-pressed="false">Dono(a) de carro</button>
+        </div>
+      </div>
+      <label class="check" id="termos-l"><input type="checkbox" id="termos"> <span>Li e aceito os <a class="link" href="termos.html#termos" target="_blank" rel="noopener">termos de uso</a> e a <a class="link" href="termos.html#privacidade" target="_blank" rel="noopener">política de privacidade</a>.</span></label>
+      <button class="btn btn-p btn-bloco" type="submit">Criar conta</button>
+      <p class="centro mudo">Já tem conta? <a class="link" href="entrar.html">Entrar</a></p>
+    </form>
+  </main>
+</div>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  VX.simbolo();
+  document.getElementById('google').innerHTML = VX.iconeGoogle() + 'Criar com Google';
+
+  var perfil = 'motorista';
+  document.getElementById('perfil').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-p]');
+    if (!b) return;
+    perfil = b.dataset.p;
+    this.querySelectorAll('[data-p]').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+  });
+
+  // Força da senha (simples): tamanho, número e letra maiúscula ou símbolo
+  var TXT = ['Use letras e números.', 'Fraca', 'Média', 'Forte'];
+  document.getElementById('senha').addEventListener('input', function () {
+    var s = this.value, n = 0;
+    if (s.length) n = 1;
+    if (s.length >= 8 && /\d/.test(s) && /[a-z]/i.test(s)) n = 2;
+    if (n === 2 && s.length >= 10 && (/[A-Z]/.test(s) || /[^A-Za-z0-9]/.test(s))) n = 3;
+    document.getElementById('forca').dataset.n = n;
+    document.getElementById('forca-txt').textContent = n ? 'Senha ' + TXT[n].toLowerCase() : TXT[0];
+    marcaErro('senha', '');
+  });
+
+  function marcaErro(id, msg) {
+    var campo = document.getElementById(id).closest('.campo');
+    campo.classList.toggle('erro', !!msg);
+    var m = campo.querySelector('.msg-erro');
+    if (msg) {
+      if (!m) { m = document.createElement('span'); m.className = 'msg-erro'; campo.appendChild(m); }
+      m.textContent = msg;
+    } else if (m) m.remove();
+    return !msg;
+  }
+
+  // Conta nova: começa sem carros (garagem vazia), mas a vitrine e as oficinas de exemplo continuam.
+  function criar(nome, email, senha, comGoogle) {
+    if (VXAPI.ativo) return criarNaApi(nome, email, senha, comGoogle);
+    var d = VX.restaurar();
+    d.usuario = { nome: nome, email: email, perfil: perfil, cidade: 'Curitiba, PR', desde: VX.isoData(VX.hoje()).slice(0, 7) };
+    d.carros = []; d.manutencoes = []; d.pagamentos = []; d.meusAnuncios = []; d.favoritos = [];
+    d.logado = true;
+    VX.salvar(d);
+    VX.avisoDepois('Conta criada! Agora cadastre o seu carro.');
+    // ?ir=vitrine.html (vem da landing): depois de entrar, segue para lá. Só aceita telas do próprio app.
+    var ir = VX.param('ir');
+    location.href = ir && /^[a-z-]+\.html$/.test(ir) ? ir : 'garagem.html';
+  }
+
+  // Modo API: cria a conta de verdade (garagem vazia; os carros de exemplo ficam em Perfil > Restaurar).
+  function criarNaApi(nome, email, senha, comGoogle) {
+    var btn = comGoogle ? document.getElementById('google') : document.querySelector('#form [type=submit]');
+    var txt = btn.innerHTML;
+    btn.disabled = true;
+    if (!comGoogle) btn.textContent = 'Criando...';
+    (comGoogle ? VXAPI.google() : VXAPI.criarConta(nome, email, senha, perfil)).then(function (d) {
+      VX.avisoDepois(d.carros.length ? 'Bem-vindo de volta, ' + d.usuario.nome.split(' ')[0] + '!' : 'Conta criada! Agora cadastre o seu carro.');
+      var ir = VX.param('ir');
+      location.href = ir && /^[a-z-]+\.html$/.test(ir) ? ir : 'garagem.html';
+    }, function (e) {
+      btn.disabled = false; btn.innerHTML = txt;
+      if (/e-mail/i.test(e.message) && !comGoogle) { marcaErro('email', e.message); document.getElementById('email').focus(); }
+      else VX.toast(e.message);
+    });
+  }
+
+  document.getElementById('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var nome = document.getElementById('nome').value.trim();
+    var email = document.getElementById('email').value.trim();
+    var senha = document.getElementById('senha').value;
+    var ok = marcaErro('nome', nome.length < 2 ? 'Digite seu nome.' : '');
+    ok = marcaErro('email', !email ? 'Digite seu e-mail.' : (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? '' : 'Esse e-mail não parece válido.')) && ok;
+    ok = marcaErro('senha', senha.length < 8 ? 'A senha precisa ter pelo menos 8 caracteres.' : '') && ok;
+    var termos = document.getElementById('termos').checked;
+    document.getElementById('termos-l').classList.toggle('erro', !termos);
+    if (!termos && ok) VX.toast('Aceite os termos para continuar.');
+    if (ok && termos) criar(nome, email, senha);
+    else { var f = document.querySelector('.campo.erro input'); if (f) f.focus(); }
+  });
+  ['nome', 'email'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', function () { marcaErro(id, ''); });
+  });
+  document.getElementById('termos').addEventListener('change', function () { document.getElementById('termos-l').classList.remove('erro'); });
+  document.getElementById('google').addEventListener('click', function () { criar('Novo usuário', 'voce@gmail.com', '', true); });
+</script>
+</body>
+</html>

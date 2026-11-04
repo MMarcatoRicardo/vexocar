@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anunciar carro · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  .fotos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .fotos .foto-up { min-height: 0; aspect-ratio: 4 / 3; font-size: 12px; }
+  .fotos .foto-up svg { width: 22px; height: 22px; }
+  .fotos .principal { position: relative; aspect-ratio: 4 / 3; border-radius: var(--r-g); overflow: hidden; }
+  .fotos .principal img { width: 100%; height: 100%; object-fit: cover; }
+  .fotos .principal span { position: absolute; left: 6px; bottom: 6px; }
+  .fotos .tirar { position: absolute; top: 6px; right: 6px; z-index: 2; width: 28px; height: 28px; border-radius: 50%; background: rgba(14, 15, 17, .75); display: grid; place-items: center; }
+  .fotos .tirar svg { width: 14px; height: 14px; }
+  .fipe-c { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .fipe-c strong { font-size: 18px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .comparacao { margin-top: 8px; font-size: 14px; }
+  .comparacao.abaixo { color: var(--verde); }
+  .comparacao.acima { color: var(--ambar); }
+  .junto { display: flex; align-items: center; gap: 16px; }
+  .linha-switch { display: flex; align-items: center; gap: 12px; }
+  @media (max-width: 639px) { .fotos { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<!-- Tela 11 (Anunciar carro): transforma o carro da garagem em anúncio, levando o histórico junto. -->
+<body class="shell" data-pilha="nao">
+<main class="conteudo entra">
+  <header class="topo">
+    <a class="voltar" href="vitrine.html" aria-label="Voltar" data-icone="voltar" id="voltar"></a>
+    <h1>Anunciar carro</h1>
+  </header>
+
+  <section class="vazio" id="sem-carro" hidden>
+    <h2>Nenhum carro na garagem</h2>
+    <p>Para anunciar, primeiro cadastre seu carro. O histórico que você registrar vai junto para a vitrine.</p>
+    <a class="btn btn-p" href="adicionar-carro.html" data-icone="mais">Adicionar carro</a>
+  </section>
+
+  <form class="duas-col" id="form" hidden novalidate>
+    <div class="form">
+      <div class="campo">
+        <span class="rotulo-campo">Qual carro?</span>
+        <div class="chips quebra" id="carros" role="radiogroup" aria-label="Qual carro"></div>
+      </div>
+      <div id="ja-anunciado"></div>
+
+      <div class="campo">
+        <span class="rotulo-campo">Fotos <span class="mudo">(a foto do carro já entra; adicione até 3)</span></span>
+        <div class="fotos" id="fotos"></div>
+      </div>
+
+      <div class="campo" id="campo-preco">
+        <label for="preco">Preço</label>
+        <input id="preco" inputmode="numeric" placeholder="R$ 0" autocomplete="off">
+        <span class="msg-erro" id="erro-preco" hidden>Informe o preço do carro.</span>
+      </div>
+      <div class="cartao">
+        <div class="fipe-c"><span class="mudo peq" id="fipe-rot">Tabela FIPE</span><strong id="fipe"></strong></div>
+        <p class="comparacao mudo" id="comparacao">Digite o preço para comparar com a FIPE.</p>
+      </div>
+
+      <div class="campo">
+        <label for="descricao">Descrição</label>
+        <textarea id="descricao" maxlength="600"></textarea>
+        <span class="ajuda">Conte o estado do carro, se é único dono, o que foi trocado.</span>
+      </div>
+
+      <label class="cartao linha-switch" for="valores">
+        <span><strong style="font-weight:600">Mostrar valores das manutenções</strong><br><span class="mudo peq">Se desligar, o comprador vê os serviços e as datas, mas não quanto você pagou.</span></span>
+        <span class="switch"><input type="checkbox" id="valores" checked><span></span></span>
+      </label>
+    </div>
+
+    <aside class="fixo">
+      <div class="cartao">
+        <span class="rotulo">Vai junto com o anúncio</span>
+        <div class="junto" style="margin-top:12px"><div id="gauge"></div>
+          <div><div id="selo"></div><p class="mudo peq" style="margin-top:8px" id="resumo"></p></div></div>
+        <ul class="lista" style="list-style:none;margin-top:12px" id="itens"></ul>
+      </div>
+      <button class="btn btn-p btn-bloco" type="submit" style="margin-top:14px" data-icone="vitrine">Publicar na vitrine</button>
+      <p class="mudo peq centro" style="margin-top:10px">Depois de vender, você marca como vendido e transfere o prontuário ao comprador.</p>
+    </aside>
+  </form>
+</main>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/vitrine.js"></script>
+<script>
+  VX.shell('vitrine');
+  var d = VX.db(), esc = VX.esc, fmt = VX.fmt;
+  d.meusAnuncios = d.meusAnuncios || [];
+
+  if (!d.carros.length) {
+    document.getElementById('sem-carro').hidden = false;
+  } else {
+    document.getElementById('form').hidden = false;
+    var c = VX.carro(d, VX.param('carro')) || d.carros[0];
+    if (VX.param('carro')) document.getElementById('voltar').href = 'carro.html?id=' + c.id;
+    var extras = [];
+
+    function anuncioAtivo(carroId) {
+      return d.meusAnuncios.filter(function (u) { return u.carroId === carroId && !u.vendido; })[0];
+    }
+    function sugestao(c) {
+      var ms = VX.manutDoCarro(d, c.id), ver = ms.filter(function (m) { return m.nota; }).length;
+      return VX.nomeCarro(c) + ' ' + c.versao + ', ' + fmt.km(c.km) + '. ' + ms.length + ' manutenções registradas no VEXOcar' +
+        (ver ? ', ' + ver + ' com nota fiscal' : '') + '. ';
+    }
+
+    function desenhar() {
+      document.getElementById('carros').innerHTML = d.carros.map(function (x) {
+        return '<button type="button" class="chip" role="radio" aria-checked="' + (x.id === c.id) + '" aria-pressed="' + (x.id === c.id) + '" data-c="' + x.id + '">' + esc(VX.nomeCurto(x)) + '</button>';
+      }).join('');
+      var ja = anuncioAtivo(c.id);
+      document.getElementById('ja-anunciado').innerHTML = ja ? '<a class="aviso" href="anuncio.html?id=' + ja.id + '">' + VX.icone('alerta') +
+        '<span>Este carro já está anunciado. Publicar de novo troca o anúncio atual. <span class="link">Ver anúncio ›</span></span></a>' : '';
+
+      // Fotos: a do carro + até 3 extras
+      var html = '<div class="principal"><img src="' + esc(c.foto) + '" alt="Foto do ' + esc(VX.nomeCarro(c)) + '"><span class="tag">Principal</span></div>';
+      extras.forEach(function (f, i) {
+        html += '<div class="principal"><img src="' + f + '" alt="Foto extra ' + (i + 1) + '"><button type="button" class="tirar" data-tirar="' + i + '" aria-label="Tirar foto ' + (i + 1) + '">' + VX.icone('fechar') + '</button></div>';
+      });
+      if (extras.length < 3) html += '<label class="foto-up">' + VX.icone('camera') + 'Adicionar foto<input type="file" accept="image/*" id="nova-foto"></label>';
+      document.getElementById('fotos').innerHTML = html;
+
+      var fipe = VXV.fipeDe(c);
+      document.getElementById('fipe-rot').textContent = 'Tabela FIPE de exemplo (' + fmt.mesAno(VX.hoje()) + ')';
+      document.getElementById('fipe').textContent = fmt.moeda(fipe);
+
+      var n = VX.nota(d, c), ms = VX.manutDoCarro(d, c.id), ver = ms.filter(function (m) { return m.nota; }).length;
+      document.getElementById('gauge').innerHTML = VX.gauge(n);
+      document.getElementById('selo').innerHTML = VX.selo();
+      document.getElementById('resumo').textContent = 'Nota de saúde ' + n + ' · ' + VX.textoNota(n);
+      document.getElementById('itens').innerHTML =
+        '<li>' + VX.icone('check') + '<span>' + ms.length + ' manutenções na linha do tempo</span></li>' +
+        '<li>' + VX.icone('documento') + '<span>' + ver + ' com nota fiscal anexada</span></li>' +
+        '<li>' + VX.icone('qr') + '<span>Link do histórico público para o comprador conferir</span></li>';
+      document.querySelectorAll('#itens svg').forEach(function (s) { s.style.cssText = 'width:18px;height:18px;color:var(--verde);flex:none'; });
+      VX.animarGauges();
+      comparar();
+    }
+
+    function lerPreco() { return parseInt(document.getElementById('preco').value.replace(/\D/g, ''), 10) || 0; }
+    function comparar() {
+      var p = lerPreco(), fipe = VXV.fipeDe(c), el = document.getElementById('comparacao');
+      if (!p) { el.className = 'comparacao mudo'; el.textContent = 'Digite o preço para comparar com a FIPE.'; return; }
+      var f = VXV.difFipe(p, fipe);
+      el.className = 'comparacao ' + (f.pct < 0 ? 'abaixo' : f.pct > 0 ? 'acima' : 'mudo');
+      el.textContent = f.pct === 0 ? 'Seu preço está na média da FIPE.' : 'Seu preço está ' + f.txt + '.' + (f.pct > 10 ? ' Acima de 10% costuma vender mais devagar.' : '');
+    }
+
+    document.getElementById('preco').addEventListener('input', function (e) {
+      var p = lerPreco();
+      e.target.value = p ? fmt.moeda(p) : '';
+      document.getElementById('campo-preco').classList.remove('erro');
+      document.getElementById('erro-preco').hidden = true;
+      comparar();
+    });
+    document.getElementById('carros').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-c]'); if (!b) return;
+      var desc = document.getElementById('descricao');
+      var tinhaSugestao = desc.value === sugestao(c);
+      c = VX.carro(d, b.dataset.c); extras = [];
+      if (tinhaSugestao || !desc.value) desc.value = sugestao(c);
+      desenhar();
+    });
+    document.getElementById('fotos').addEventListener('change', function (e) {
+      if (e.target.id !== 'nova-foto' || !e.target.files[0]) return;
+      VX.lerFoto(e.target.files[0], 1000).then(function (url) { extras.push(url); desenhar(); }, function () { VX.toast('Não consegui ler essa foto'); });
+    });
+    document.getElementById('fotos').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-tirar]'); if (!b) return;
+      extras.splice(+b.dataset.tirar, 1); desenhar();
+    });
+
+    document.getElementById('form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var p = lerPreco();
+      if (!p) {
+        document.getElementById('campo-preco').classList.add('erro');
+        document.getElementById('erro-preco').hidden = false;
+        document.getElementById('preco').focus();
+        return;
+      }
+      var ja = anuncioAtivo(c.id);
+      if (ja) d.meusAnuncios.splice(d.meusAnuncios.indexOf(ja), 1);
+      var novo = {
+        id: VX.novoId('u'), carroId: c.id, preco: p, fipe: VXV.fipeDe(c),
+        descricao: document.getElementById('descricao').value.trim(),
+        mostrarValores: document.getElementById('valores').checked,
+        fotos: [c.foto].concat(extras), publicado: VX.isoData(VX.hoje()), visitas: 0, vendido: false, pausado: false
+      };
+      d.meusAnuncios.push(novo);
+      VX.salvar(d);
+      VX.avisoDepois('Anúncio publicado na vitrine');
+      location.href = 'anuncio.html?id=' + novo.id;
+    });
+
+    document.getElementById('descricao').value = sugestao(c);
+    desenhar();
+  }
+</script>
+</body>
+</html>

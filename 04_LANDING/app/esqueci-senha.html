@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Esqueci a senha · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<!-- Tela 16: Esqueci a senha. Na etapa 7 o e-mail com o link sai pelo próprio Firebase Auth. -->
+<body>
+<div class="auth">
+  <div class="auth-foto" aria-hidden="true">
+    <img src="../img/motor.jpg" alt="">
+    <blockquote>Acontece com todo mundo.<small>Em 1 minuto você cria uma senha nova.</small></blockquote>
+  </div>
+
+  <main class="auth-form entra">
+    <a class="wm" href="../index.html" aria-label="VEXOcar, voltar ao site"><svg><use href="#v"/></svg>EXO<span>car</span></a>
+
+    <section id="pedir">
+      <h1>Esqueci a senha</h1>
+      <p class="sub">Digite o e-mail da sua conta. Vamos mandar um link para você criar uma senha nova.</p>
+      <form class="form" id="form" novalidate>
+        <div class="campo">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" autocomplete="email" placeholder="voce@email.com" required>
+        </div>
+        <button class="btn btn-p btn-bloco" type="submit">Enviar link</button>
+        <a class="btn btn-g btn-bloco" href="entrar.html">Voltar ao login</a>
+      </form>
+    </section>
+
+    <section id="enviado" hidden>
+      <h1>Confira seu e-mail</h1>
+      <div class="aviso ok" style="margin:20px 0 24px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10Z"/><path d="m8 12 3 3 5-6"/></svg>
+        <span><strong>Link enviado para <span id="para"></span></strong><br><span class="peq" style="color:var(--off2)">Olhe a caixa de entrada e o spam. O link vale por 1 hora.</span></span>
+      </div>
+      <a class="btn btn-p btn-bloco" href="entrar.html">Voltar ao login</a>
+      <button class="btn btn-g btn-bloco" type="button" id="reenviar" style="margin-top:8px">Não chegou? Enviar de novo</button>
+    </section>
+  </main>
+</div>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  VX.simbolo();
+  var campo = document.getElementById('email').closest('.campo');
+  function erro(msg) {
+    campo.classList.toggle('erro', !!msg);
+    var m = campo.querySelector('.msg-erro');
+    if (msg) { if (!m) { m = document.createElement('span'); m.className = 'msg-erro'; campo.appendChild(m); } m.textContent = msg; }
+    else if (m) m.remove();
+  }
+  document.getElementById('email').addEventListener('input', function () { erro(''); });
+  document.getElementById('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = document.getElementById('email').value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { erro(email ? 'Esse e-mail não parece válido.' : 'Digite seu e-mail.'); document.getElementById('email').focus(); return; }
+    pedir(email, document.querySelector('#form [type=submit]'));
+  });
+  // Modo API com Firebase: o Firebase manda o e-mail de troca de senha de verdade.
+  function pedir(email, btn) {
+    function pronto() {
+      document.getElementById('para').textContent = email;
+      document.getElementById('pedir').hidden = true;
+      document.getElementById('enviado').hidden = false;
+    }
+    if (!VXAPI.ativo) return pronto();
+    btn.disabled = true;
+    VXAPI.esqueciSenha(email).then(function () { btn.disabled = false; pronto(); }, function (e) { btn.disabled = false; VX.toast(e.message); });
+  }
+  document.getElementById('reenviar').addEventListener('click', function () {
+    var b = this;
+    if (!VXAPI.ativo) return VX.toast('Enviamos o link de novo.');
+    b.disabled = true;
+    VXAPI.esqueciSenha(document.getElementById('email').value.trim()).then(function () { b.disabled = false; VX.toast('Enviamos o link de novo.'); }, function (e) { b.disabled = false; VX.toast(e.message); });
+  });
+</script>
+</body>
+</html>

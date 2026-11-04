@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adicionar carro · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  .form-carro { max-width: 720px; }
+  .conteudo > * { max-width: 720px; margin-inline: auto; }
+  .foto-up { min-height: 200px; }
+  .placa-campo input { text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+  .lado-3 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 640px) { .lado-3 { grid-template-columns: 1fr 1fr 1fr; } }
+</style>
+</head>
+<!-- Tela 04: Adicionar carro. Cadastro do carro (placa, modelo, ano, km e média de km por mês). -->
+<body class="shell" data-pilha="nao">
+<main class="conteudo entra">
+  <header class="topo">
+    <a class="voltar" href="garagem.html" aria-label="Fechar e voltar para a garagem" data-icone="fechar"></a>
+    <h1>Adicionar carro</h1>
+  </header>
+
+  <form class="form form-carro" id="form" novalidate>
+    <label class="foto-up" id="foto-box">
+      <input type="file" accept="image/*" id="foto" aria-label="Foto do carro">
+      <span data-icone="camera"></span>
+      <span>Toque para adicionar uma foto do carro<br><span class="peq">opcional</span></span>
+    </label>
+
+    <div class="lado">
+      <div class="campo placa-campo">
+        <label for="placa">Placa</label>
+        <input id="placa" maxlength="8" placeholder="ABC1D23" autocomplete="off" required>
+        <span class="msg-erro" hidden>Placa inválida. Use ABC-1234 ou ABC1D23.</span>
+      </div>
+      <div class="campo">
+        <label for="ano">Ano</label>
+        <input id="ano" inputmode="numeric" maxlength="4" placeholder="2019" required>
+        <span class="msg-erro" hidden>Ano entre 1950 e 2027.</span>
+      </div>
+    </div>
+
+    <div class="lado-3">
+      <div class="campo">
+        <label for="marca">Marca</label>
+        <input id="marca" list="marcas" placeholder="Volkswagen" required>
+        <span class="msg-erro" hidden>Informe a marca.</span>
+      </div>
+      <div class="campo">
+        <label for="modelo">Modelo</label>
+        <input id="modelo" placeholder="Polo" required>
+        <span class="msg-erro" hidden>Informe o modelo.</span>
+      </div>
+      <div class="campo">
+        <label for="versao">Versão</label>
+        <input id="versao" placeholder="1.0 TSI Highline">
+      </div>
+    </div>
+    <datalist id="marcas">
+      <option>Chevrolet</option><option>Fiat</option><option>Ford</option><option>Honda</option><option>Hyundai</option>
+      <option>Jeep</option><option>Nissan</option><option>Renault</option><option>Toyota</option><option>Volkswagen</option>
+    </datalist>
+
+    <div class="lado">
+      <div class="campo">
+        <label for="km">Km atual</label>
+        <input id="km" inputmode="numeric" placeholder="48.320" required>
+        <span class="msg-erro" hidden>Informe o km do painel.</span>
+      </div>
+      <div class="campo">
+        <label for="kmmes">Km por mês (média)</label>
+        <input id="kmmes" inputmode="numeric" placeholder="2.500" required>
+        <span class="msg-erro" hidden>Informe uma média.</span>
+      </div>
+    </div>
+    <p class="mudo peq">Usamos a placa para avisar o IPVA e o licenciamento, e a média de km para prever a próxima revisão.</p>
+
+    <div class="fila-btn">
+      <a class="btn btn-s" href="garagem.html" data-voltar>Cancelar</a>
+      <button class="btn btn-p" type="submit" data-icone="check">Salvar carro</button>
+    </div>
+  </form>
+</main>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  VX.shell('garagem');
+  var d = VX.db();
+  var fotoDados = null;
+  // Desenho neutro de carro (sem foto), em SVG
+  var SEM_FOTO = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200"><rect width="320" height="200" fill="#23262B"/><path d="M40 160h240" stroke="#2A2D33" stroke-width="4" stroke-dasharray="16 12"/><path d="M78 138v-18l18-30c4-6 9-9 16-9h88c7 0 12 3 17 9l24 30c8 1 13 6 13 13v5" fill="none" stroke="#8A8F98" stroke-width="5" stroke-linejoin="round"/><path d="M78 138h176" stroke="#8A8F98" stroke-width="5"/><circle cx="112" cy="140" r="15" fill="#23262B" stroke="#2FD47A" stroke-width="5"/><circle cx="214" cy="140" r="15" fill="#23262B" stroke="#2FD47A" stroke-width="5"/></svg>');
+
+  function num(v) { return parseInt(String(v).replace(/\D/g, ''), 10) || 0; }
+  function milhar(el) { el.addEventListener('input', function () { var n = num(el.value); el.value = n ? n.toLocaleString('pt-BR') : ''; }); }
+  milhar(document.getElementById('km')); milhar(document.getElementById('kmmes'));
+
+  var placa = document.getElementById('placa');
+  placa.addEventListener('input', function () { placa.value = placa.value.toUpperCase().replace(/[^A-Z0-9-]/g, ''); });
+
+  document.getElementById('foto').addEventListener('change', function (e) {
+    var f = e.target.files[0];
+    if (!f) return;
+    VX.lerFoto(f).then(function (url) {
+      fotoDados = url;
+      var box = document.getElementById('foto-box');
+      var img = box.querySelector('img') || document.createElement('img');
+      img.src = url; img.alt = 'Prévia da foto do carro';
+      box.appendChild(img);
+    }).catch(function () { VX.toast('Não deu para ler essa imagem.'); });
+  });
+
+  function marca(id, ok) {
+    var c = document.getElementById(id).closest('.campo');
+    c.classList.toggle('erro', !ok);
+    c.querySelector('.msg-erro').hidden = ok;
+    return ok;
+  }
+
+  document.getElementById('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var p = placa.value.replace(/[^A-Z0-9]/g, '');
+    var ano = num(document.getElementById('ano').value);
+    var km = num(document.getElementById('km').value);
+    var kmMes = num(document.getElementById('kmmes').value);
+    var v = [
+      marca('placa', /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/.test(p)),
+      marca('ano', ano >= 1950 && ano <= 2027),
+      marca('marca', document.getElementById('marca').value.trim().length > 1),
+      marca('modelo', document.getElementById('modelo').value.trim().length > 0),
+      marca('km', document.getElementById('km').value.trim() !== ''),
+      marca('kmmes', kmMes > 0)
+    ];
+    if (v.indexOf(false) >= 0) { document.querySelector('.campo.erro input').focus(); return; }
+    if (d.carros.some(function (c) { return c.placa === p; })) { marca('placa', false); VX.toast('Essa placa já está na sua garagem.'); return; }
+
+    var novo = {
+      id: VX.novoId('c'), marca: document.getElementById('marca').value.trim(), modelo: document.getElementById('modelo').value.trim(),
+      versao: document.getElementById('versao').value.trim(), ano: ano, placa: p, km: km, kmMes: kmMes,
+      foto: fotoDados || SEM_FOTO, cor: ''
+    };
+    d.carros.push(novo);
+    VX.salvar(d);
+    VX.avisoDepois('Carro adicionado. Os alertas já estão ligados.');
+    location.href = 'carro.html?id=' + novo.id;
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anúncio · VEXOcar</title>
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  @media (min-width: 960px) { .anuncio-det { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); } }
+  .galeria-principal { aspect-ratio: 16 / 10; border-radius: var(--r-g); overflow: hidden; background: var(--grafite3); position: relative; }
+  .galeria-principal img { width: 100%; height: 100%; object-fit: cover; }
+  .galeria-principal .contagem { position: absolute; right: 12px; bottom: 12px; padding: 4px 10px; border-radius: 999px; background: rgba(14, 15, 17, .7); font-size: 12px; font-weight: 600; }
+  .miniaturas { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; }
+  .miniaturas button { width: 84px; height: 60px; flex: none; border-radius: 10px; overflow: hidden; border: 2px solid transparent; opacity: .7; transition: opacity var(--t), border-color var(--t); }
+  .miniaturas button[aria-current="true"] { border-color: var(--verde); opacity: 1; }
+  .miniaturas img { width: 100%; height: 100%; object-fit: cover; }
+  .preco-g { font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .fipe-linha { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; font-size: 14px; }
+  .fipe-linha .verde, .preco-cel .verde { color: var(--verde); font-weight: 600; }
+  .preco-cel { margin-top: 14px; }
+  .preco-cel p { margin-top: 4px; color: var(--cinza); }
+  @media (max-width: 959px) { #titulo { font-size: 19px !important; } }
+  .saude { display: flex; align-items: center; gap: 18px; }
+  .vendedor { display: flex; align-items: center; gap: 12px; }
+  .fixo-cel { position: fixed; left: 0; right: 0; bottom: var(--barra); z-index: 36; padding: 12px 16px; background: rgba(14, 15, 17, .94); border-top: 1px solid var(--linha); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  @media (min-width: 960px) { .fixo-cel { display: none; } }
+  @media (max-width: 959px) { .conteudo { padding-bottom: calc(var(--barra) + 110px); } }
+</style>
+</head>
+<!-- Tela 10 (Anúncio): o carro à venda com a linha do tempo comprovada. "Tenho interesse" abre o WhatsApp do vendedor. -->
+<body class="shell">
+<main class="conteudo entra" id="pagina">
+  <header class="topo">
+    <a class="voltar" href="vitrine.html" aria-label="Voltar para a vitrine" data-icone="voltar" id="voltar"></a>
+    <h1 id="titulo" style="font-size:22px">Anúncio</h1>
+    <div class="acoes-topo">
+      <button class="ico-btn" id="fav" aria-label="Favoritar" aria-pressed="false" data-icone="coracao"></button>
+      <button class="ico-btn" id="compartilhar" aria-label="Compartilhar" data-icone="compartilhar"></button>
+    </div>
+  </header>
+
+  <div class="duas-col anuncio-det">
+    <section>
+      <div class="galeria-principal"><img id="foto" src="" alt=""><span class="contagem" id="contagem"></span></div>
+      <div class="miniaturas" id="miniaturas"></div>
+      <div class="so-celular preco-cel"><div class="preco-g" id="preco-cel"></div><p class="peq" id="fipe-cel"></p></div>
+
+      <div class="cartao" style="margin-top:14px">
+        <div class="saude">
+          <div id="gauge"></div>
+          <div>
+            <div style="margin-bottom:8px" id="selo"></div>
+            <p id="nota-txt"></p>
+            <p class="mudo peq" id="contas"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="secao-t"><h2>Sobre o carro</h2></div>
+      <div class="cartao"><p id="descricao" style="color:var(--off2)"></p>
+        <div class="lista" style="margin-top:10px" id="ficha"></div></div>
+
+      <div class="secao-t"><h2>Histórico de manutenção</h2><a id="link-h" href="#" hidden>Ver histórico completo ›</a></div>
+      <div class="cartao">
+        <div class="legenda" style="margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--linha)">
+          <span><i class="v"></i>Com nota fiscal (comprovado)</span>
+          <span><i></i>Sem nota fiscal</span>
+        </div>
+        <div class="linha-tempo" id="linha"></div>
+        <p class="mudo peq" id="obs-valores" style="margin-top:14px" hidden>O vendedor escolheu não mostrar os valores pagos.</p>
+      </div>
+    </section>
+
+    <aside class="fixo">
+      <div class="cartao">
+        <p class="mudo peq" id="versao"></p>
+        <div class="preco-g" id="preco" style="margin-top:6px"></div>
+        <div class="fipe-linha"><span class="mudo" id="fipe"></span><span id="dif"></span></div>
+        <div id="acoes" style="margin-top:18px;display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+      <div class="cartao" id="vendedor-c">
+        <span class="rotulo">Vendedor</span>
+        <div class="vendedor" style="margin-top:10px"><span class="avatar" id="v-av"></span>
+          <div><strong id="v-nome"></strong><p class="mudo peq" id="v-info"></p></div></div>
+      </div>
+      <p class="mudo peq" style="margin-top:12px">O VEXOcar não intermedeia pagamento. Combine a compra direto com o vendedor e confira o carro pessoalmente.</p>
+    </aside>
+  </div>
+</main>
+
+<div class="fixo-cel" id="fixo-cel"></div>
+
+<script src="js/dados.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/vitrine.js"></script>
+<script>
+  VX.shell('vitrine');
+  var d = VX.db(), esc = VX.esc, fmt = VX.fmt;
+  var a = VXV.achar(d, VX.param('id')) || VXV.exemplos(d)[0];
+  if (a.meu) document.getElementById('voltar').href = 'vitrine.html?meus=1';
+
+  var nome = VXV.nomeAnuncio(a);
+  document.title = nome + ' · VEXOcar';
+  document.getElementById('titulo').textContent = a.marca + ' ' + a.modelo + ' ' + a.ano;
+
+  // Galeria
+  var fotoAtual = 0;
+  function mostrarFoto(i) {
+    fotoAtual = i;
+    var f = document.getElementById('foto');
+    f.src = a.fotos[i]; f.alt = 'Foto ' + (i + 1) + ' do ' + nome;
+    document.getElementById('contagem').textContent = (i + 1) + '/' + a.fotos.length;
+    document.getElementById('contagem').hidden = a.fotos.length < 2;
+    document.querySelectorAll('#miniaturas button').forEach(function (b, j) { b.setAttribute('aria-current', j === i); });
+  }
+  document.getElementById('miniaturas').innerHTML = a.fotos.length > 1 ? a.fotos.map(function (f, i) {
+    return '<button data-i="' + i + '" aria-label="Ver foto ' + (i + 1) + '"><img src="' + esc(f) + '" alt=""></button>';
+  }).join('') : '';
+  document.getElementById('miniaturas').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-i]'); if (b) mostrarFoto(+b.dataset.i);
+  });
+  mostrarFoto(0);
+
+  // Saúde e ficha
+  document.getElementById('gauge').innerHTML = VX.gauge(a.nota, 'g');
+  document.getElementById('selo').innerHTML = VX.selo();
+  document.getElementById('nota-txt').textContent = VX.textoNota(a.nota);
+  document.getElementById('contas').textContent = a.manutencoes + ' manutenções registradas · ' + a.comprovadas + ' com nota fiscal';
+  document.getElementById('descricao').textContent = a.descricao || 'Sem descrição.';
+  var cat = { hatch: 'Hatch', seda: 'Sedã', suv: 'SUV', esportivo: 'Esportivo', classico: 'Clássico' }[a.categoria] || '';
+  document.getElementById('ficha').innerHTML = [['Versão', a.versao], ['Ano', a.ano], ['Quilometragem', fmt.km(a.km)], ['Categoria', cat], ['Cidade', a.cidade], ['Anunciado em', fmt.data(a.publicado)]]
+    .map(function (l) { return '<div><span class="mudo">' + l[0] + '</span><span style="margin-left:auto;text-align:right">' + esc(l[1]) + '</span></div>'; }).join('');
+
+  // Preço e FIPE
+  var f = VXV.difFipe(a.preco, a.fipe);
+  document.getElementById('versao').textContent = a.versao + ' · ' + fmt.milKm(a.km);
+  document.getElementById('preco').textContent = fmt.moeda(a.preco);
+  document.getElementById('fipe').textContent = 'FIPE ' + fmt.moeda(a.fipe);
+  var dif = document.getElementById('dif'); dif.textContent = f.txt; dif.className = f.cls;
+  document.getElementById('preco-cel').textContent = fmt.moeda(a.preco);
+  document.getElementById('fipe-cel').innerHTML = 'FIPE ' + fmt.moeda(a.fipe) + ' · <span class="' + f.cls + '">' + f.txt + '</span>';
+
+  // Linha do tempo do histórico
+  var itens;
+  if (a.meu) {
+    itens = VX.manutDoCarro(d, a.carroId).map(function (m) { return { data: m.data, km: m.km, servico: m.servico, nota: m.nota, oficina: m.oficina, valor: m.valor }; });
+    var lh = document.getElementById('link-h'); lh.hidden = false; lh.href = 'h.html?id=' + a.carroId;
+    if (!a.mostrarValores) document.getElementById('obs-valores').hidden = false;
+  } else {
+    itens = (a.historico || []).slice();
+    if (a.comunidade) {
+      // Anúncio de outra pessoa: link do histórico público e +1 visita (uma vez por sessão)
+      var lh2 = document.getElementById('link-h'); lh2.hidden = false; lh2.href = 'h.html?id=' + a.carroId;
+      if (!a.mostrarValores) document.getElementById('obs-valores').hidden = false;
+      if (VXAPI.ativo) VXAPI.visita(a.id);
+    }
+  }
+  itens.sort(function (x, y) { return x.data < y.data ? 1 : -1; });
+  var html = '', ano = null;
+  itens.forEach(function (m) {
+    var y = m.data.slice(0, 4);
+    if (y !== ano) { html += '<div class="lt-ano">' + y + '</div>'; ano = y; }
+    var valor = (a.meu || a.comunidade) && a.mostrarValores && m.valor != null ? '<span class="num">' + fmt.moedaCheia(m.valor) + '</span>' : '<span class="mudo peq">' + fmt.mesAno(m.data) + '</span>';
+    html += '<div class="lt-item' + (m.nota ? ' comprovado' : '') + '">' +
+      '<div class="lt-cab"><strong>' + esc(m.servico) + '</strong>' + valor + '</div>' +
+      '<div class="lt-meta">' + fmt.data(m.data) + ' · ' + fmt.km(m.km) + ' · ' + esc(m.oficina || 'sem oficina') + '</div>' +
+      '<div class="lt-tags">' + (m.nota ? '<span class="tag tag-v">' + VX.icone('documento') + 'Nota fiscal anexada</span>' : '<span class="tag">Sem nota fiscal</span>') + '</div></div>';
+  });
+  if (!a.meu && a.manutencoes > itens.length) html += '<p class="mudo peq" style="padding-left:30px">+ ' + (a.manutencoes - itens.length) + ' registros mais antigos</p>';
+  document.getElementById('linha').innerHTML = html || '<p class="mudo">Sem registros.</p>';
+
+  // Vendedor
+  var v = a.vendedor;
+  document.getElementById('v-av').textContent = VX.iniciais(v.nome);
+  document.getElementById('v-nome').textContent = a.meu ? v.nome + ' (você)' : v.nome;
+  document.getElementById('v-info').textContent = a.cidade + ' · na VEXOcar desde ' + fmt.mesAno(v.desde + '-01');
+
+  // Ações: comprador vê WhatsApp; dono vê visitas e controles do anúncio
+  var acoes = document.getElementById('acoes'), cel = document.getElementById('fixo-cel');
+  if (a.meu) {
+    document.getElementById('fav').hidden = true;
+    var status = a.vendido ? '<span class="tag">Vendido</span>' : a.pausado ? '<span class="tag tag-a">Pausado</span>' : '<span class="tag tag-v">Ativo na vitrine</span>';
+    acoes.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">' + status + '<span class="mudo peq">' + a.visitas + ' visitas</span></div>' +
+      (a.vendido ? '' : '<a class="btn btn-p btn-bloco" href="vendido.html?id=' + a.id + '">' + VX.icone('transferir') + 'Marcar como vendido</a>' +
+        '<button class="btn btn-s btn-bloco" id="pausar">' + (a.pausado ? 'Voltar para a vitrine' : 'Pausar anúncio') + '</button>');
+    cel.innerHTML = a.vendido ? '' : '<a class="btn btn-p btn-bloco" href="vendido.html?id=' + a.id + '">Marcar como vendido</a>';
+    if (a.vendido) cel.hidden = true;
+    var bp = document.getElementById('pausar');
+    if (bp) bp.addEventListener('click', function () {
+      var u = VXV.cru(d, a.id);
+      u.pausado = !u.pausado; VX.salvar(d);
+      VX.avisoDepois(u.pausado ? 'Anúncio pausado. Ele saiu da vitrine.' : 'Anúncio de volta na vitrine.');
+      location.reload();
+    });
+  } else {
+    var link = VX.whats(v.whatsapp, 'Olá! Vi seu ' + nome + ' na VEXOcar e tenho interesse.');
+    var btn = '<a class="btn btn-p btn-bloco" href="' + link + '" target="_blank" rel="noopener">' + VX.icone('whatsapp') + 'Tenho interesse (WhatsApp)</a>';
+    acoes.innerHTML = btn + '<p class="mudo peq centro">Abre uma conversa com ' + esc(v.nome.replace(/\.$/, '')) + '.</p>';
+    cel.innerHTML = btn;
+  }
+
+  // Favoritar e compartilhar
+  var bf = document.getElementById('fav');
+  function marcaFav() {
+    var on = d.favoritos.indexOf(a.id) >= 0;
+    bf.classList.toggle('ativo', on); bf.setAttribute('aria-pressed', on);
+    bf.setAttribute('aria-label', on ? 'Tirar dos favoritos' : 'Favoritar');
+  }
+  bf.addEventListener('click', function () {
+    var i = d.favoritos.indexOf(a.id);
+    if (i >= 0) d.favoritos.splice(i, 1); else d.favoritos.push(a.id);
+    VX.salvar(d); marcaFav();
+    VX.toast(i >= 0 ? 'Tirado dos favoritos' : 'Guardado nos favoritos');
+  });
+  marcaFav();
+  document.getElementById('compartilhar').addEventListener('click', function () {
+    var url = location.href;
+    if (navigator.share) { navigator.share({ title: nome + ' na VEXOcar', url: url }).catch(function () {}); return; }
+    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () {
+      VX.toast('Link copiado');
+    }, function () { VX.toast('Copie o endereço da barra do navegador'); });
+  });
+
+  VX.animarGauges();
+</script>
+</body>
+</html>
