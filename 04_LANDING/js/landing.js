@@ -75,4 +75,21 @@
     if (!calmo && !pedido) { pedido = true; requestAnimationFrame(paralaxe); }
   }, { passive: true });
   if (!calmo) paralaxe();
+  /* App instalável (PWA): registra o service worker (../sw.js ou sw.js) e mostra os botões [data-instalar]
+     quando o celular/navegador oferece a instalação. Só pelo servidor; pelo computador (file://) não existe. */
+  (function () {
+    if (!/^https?:$/.test(location.protocol) || !('serviceWorker' in navigator)) return;
+    var raiz = /\/app\/[^/]*$/.test(location.pathname) ? '../' : '';
+    navigator.serviceWorker.register(raiz + 'sw.js', { scope: raiz || './' }).catch(function () {});
+    var pedido = null;
+    function botoes(mostrar) { document.querySelectorAll('[data-instalar]').forEach(function (b) { b.hidden = !mostrar; }); }
+    window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); pedido = e; botoes(true); });
+    window.addEventListener('appinstalled', function () { pedido = null; botoes(false); });
+    document.addEventListener('click', function (e) {
+      if (!pedido || !e.target.closest('[data-instalar]')) return;
+      e.preventDefault();
+      pedido.prompt();
+      pedido.userChoice.then(function () { pedido = null; botoes(false); });
+    });
+  })();
 })();

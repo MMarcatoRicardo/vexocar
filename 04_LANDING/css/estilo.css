@@ -29,10 +29,12 @@ img { display: block; max-width: 100%; }
 .wm-p .faixa { display: none; } /* V abaixo de 17 px fica sem faixa (regra da marca) */
 
 /* ---------- Botões ---------- */
+[hidden] { display: none !important; }
 .btn { display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 28px; border-radius: 999px; font-weight: 600; font-size: 16px; transition: background .2s, color .2s, border-color .2s, transform .2s var(--suave), box-shadow .2s; }
 .btn-sm { height: 40px; padding: 0 18px; font-size: 14px; }
 .btn-p { background: var(--verde); color: var(--grafite); }
 .btn-p:hover { background: #4BE08F; box-shadow: 0 8px 32px rgba(47, 212, 122, .35); transform: translateY(-2px); }
+button.btn { font: inherit; font-weight: 600; cursor: pointer; background: none; }
 .btn-s { border: 1px solid rgba(242, 241, 236, .4); color: var(--off); backdrop-filter: blur(6px); }
 .btn-s:hover { border-color: var(--off); background: rgba(242, 241, 236, .08); }
 .seta { display: inline-block; transition: transform .2s var(--suave); }

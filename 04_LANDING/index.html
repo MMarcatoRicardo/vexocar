@@ -7,6 +7,10 @@
 <meta name="description" content="Lembra das revisões, acha oficina perto de você e, na hora de vender, vira um anúncio com histórico comprovado.">
 <meta name="theme-color" content="#0E0F11">
 <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="img/app/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="VEXOcar">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -52,6 +56,7 @@
       <div class="acoes entra" style="--d:.4s">
         <a class="btn btn-p" href="app/criar-conta.html">Começar grátis <span class="seta">→</span></a>
         <a class="btn btn-s" href="app/demo.html">Ver demonstração</a>
+        <button type="button" class="btn btn-s" data-instalar hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Instalar app</button>
       </div>
     </div>
 
@@ -137,12 +142,12 @@
           <p class="cab-lead">Na vitrine, todo carro leva junto o prontuário: as manutenções, a nota de saúde e o preço comparado à tabela FIPE. Quem compra sabe o que está levando.</p>
         </div>
         <div class="caminhos">
-          <a class="caminho revela" href="app/entrar.html?ir=anunciar.html">
+          <a class="caminho revela" href="app/entrar.html?ir=anunciar">
             <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2v13"/><path d="m7 7 5-5 5 5"/><path d="M20 15v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4"/></svg></div>
             <div><h3>Quer vender?</h3><p>Anuncie o seu carro com o histórico que você já registrou. O selo e a nota vão junto.</p></div>
             <span class="seta">→</span>
           </a>
-          <a class="caminho revela" href="app/entrar.html?ir=vitrine.html" style="--d:.1s">
+          <a class="caminho revela" href="app/entrar.html?ir=vitrine" style="--d:.1s">
             <div class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
             <div><h3>Quer comprar?</h3><p>Consulte os carros anunciados, filtre por preço e nota e fale com o dono pelo WhatsApp.</p></div>
             <span class="seta">→</span>
