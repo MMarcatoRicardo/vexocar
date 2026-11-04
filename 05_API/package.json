@@ -1,0 +1,20 @@
+{
+  "name": "vexocar-api",
+  "version": "1.0.0",
+  "description": "API do VEXOcar: prontuário digital do carro (Projeto Integrador, Universidade Positivo)",
+  "main": "src/servidor.js",
+  "scripts": {
+    "start": "node src/servidor.js",
+    "dev": "node --watch src/servidor.js",
+    "teste": "node teste/teste-api.js"
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
+    "firebase-admin": "^14.5.0"
+  }
+}
