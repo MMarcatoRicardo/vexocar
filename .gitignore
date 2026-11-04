@@ -1,0 +1,25 @@
+# Segredos e dados locais da API (nunca sobem)
+.env
+*.env
+!.env.exemplo
+serviceAccountKey.json
+*-firebase-adminsdk-*.json
+05_API/firebase-config-web.txt
+05_API/dados-locais.json*
+05_API/uploads/
+node_modules/
+
+# Material interno do grupo
+PLANO.md
+Enunciado*.docx
+01_PESQUISA/LINKS.md
+
+# Gerados (grandes, refeitos pelo script)
+06_ALTA_FIDELIDADE/*.html
+
+# Sobras
+04_LANDING/img/_teste/
+04_LANDING/img/vitrine-fiat500.jpg
+*.log
+.DS_Store
+Thumbs.db
