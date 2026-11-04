@@ -441,21 +441,56 @@
     param: param, whats: whats, lerFoto: lerFoto, anterior: anterior
   };
 
-  /* App instalável (PWA): registra o service worker (../sw.js ou sw.js) e mostra os botões [data-instalar]
-     quando o celular/navegador oferece a instalação. Só pelo servidor; pelo computador (file://) não existe. */
+  /* App instalável (PWA): registra o service worker (../sw.js ou sw.js) e cuida dos botões [data-instalar].
+     O botão aparece sempre (menos dentro do app já instalado e pelo computador via file://, onde não dá).
+     Clique: se o navegador oferece a instalação (Chrome/Edge), abre a dele; se não (iPhone, Firefox,
+     Samsung Internet...), mostra o passo a passo daquele aparelho. */
   (function () {
-    if (!/^https?:$/.test(location.protocol) || !('serviceWorker' in navigator)) return;
-    var raiz = /\/app\/[^/]*$/.test(location.pathname) ? '../' : '';
-    navigator.serviceWorker.register(raiz + 'sw.js', { scope: raiz || './' }).catch(function () {});
-    var pedido = null;
+    var instalado = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    var podeInstalar = /^https?:$/.test(location.protocol) && !instalado;
     function botoes(mostrar) { document.querySelectorAll('[data-instalar]').forEach(function (b) { b.hidden = !mostrar; }); }
-    window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); pedido = e; botoes(true); });
+    function iniciar() { botoes(podeInstalar); }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
+    if (!podeInstalar) return;
+
+    var raiz = /\/app\/[^/]*$/.test(location.pathname) ? '../' : '';
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(raiz + 'sw.js', { scope: raiz || './' }).catch(function () {});
+    var pedido = null;
+    window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); pedido = e; });
     window.addEventListener('appinstalled', function () { pedido = null; botoes(false); });
+
+    function passos() {
+      var ua = navigator.userAgent;
+      var ios = /iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
+      if (ios) return ['No iPhone', ['Abra este site no <b>Safari</b>.', 'Toque em <b>Compartilhar</b> (o quadrado com a seta para cima).',
+        'Escolha <b>Adicionar à Tela de Início</b> e toque em <b>Adicionar</b>.']];
+      if (/android/i.test(ua)) return ['No Android', ['Toque no menu <b>⋮</b> do navegador (canto de cima).',
+        'Escolha <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.', 'Confirme em <b>Instalar</b>.']];
+      return ['No computador', ['Abra no <b>Chrome</b> ou no <b>Edge</b>.',
+        'Clique no ícone de instalar, à direita da barra de endereço (ou no menu <b>⋮</b> &gt; <b>Instalar VEXOcar</b>).', 'Confirme em <b>Instalar</b>.']];
+    }
+    function janela() {
+      var p = passos(), d = document.createElement('dialog');
+      d.setAttribute('aria-label', 'Instalar o VEXOcar');
+      d.style.cssText = 'position:fixed;inset:0;margin:auto;height:fit-content;max-height:calc(100% - 32px);overflow:auto;box-sizing:border-box;max-width:380px;width:calc(100% - 32px);padding:28px 24px 22px;border:1px solid #2A2D33;border-radius:20px;' +
+        'background:#1A1C20;color:#F2F1EC;font-family:Inter,system-ui,sans-serif;box-shadow:0 24px 80px rgba(0,0,0,.6)';
+      d.innerHTML = '<style>dialog::backdrop{background:rgba(0,0,0,.65);backdrop-filter:blur(4px)}</style>' +
+        '<div style="display:flex;align-items:center;gap:14px;margin-bottom:18px"><img src="' + raiz + 'img/app/icone-192.png" alt="" width="52" height="52" style="border-radius:13px">' +
+        '<div><p style="margin:0;font-size:18px;font-weight:700">Instalar o VEXOcar</p><p style="margin:2px 0 0;color:#8A8F98;font-size:14px">' + p[0] + ', em 3 passos</p></div></div>' +
+        '<ol style="margin:0 0 22px;padding-left:22px;line-height:1.55;font-size:15px;color:rgba(242,241,236,.85)">' +
+        p[1].map(function (t) { return '<li style="margin-bottom:8px">' + t + '</li>'; }).join('') + '</ol>' +
+        '<button type="button" style="width:100%;height:46px;border:0;border-radius:999px;background:#2FD47A;color:#0E0F11;font:inherit;font-weight:700;cursor:pointer">Entendi</button>';
+      document.body.appendChild(d);
+      d.querySelector('button').addEventListener('click', function () { d.close(); });
+      d.addEventListener('close', function () { d.remove(); });
+      d.addEventListener('click', function (e) { if (e.target === d) d.close(); });
+      if (d.showModal) d.showModal(); else d.setAttribute('open', '');
+    }
     document.addEventListener('click', function (e) {
-      if (!pedido || !e.target.closest('[data-instalar]')) return;
+      if (!e.target.closest('[data-instalar]')) return;
       e.preventDefault();
-      pedido.prompt();
-      pedido.userChoice.then(function () { pedido = null; botoes(false); });
+      if (pedido) { pedido.prompt(); pedido.userChoice.then(function (r) { pedido = null; if (r.outcome === 'accepted') botoes(false); }); }
+      else janela();
     });
   })();
 })();
