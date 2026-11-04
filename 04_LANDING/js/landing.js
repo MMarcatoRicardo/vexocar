@@ -5,6 +5,11 @@
   // Quem volta da demonstração ("Voltar ao início") sai dela: Entrar e Criar conta voltam a ser de verdade.
   // Abrindo do computador (file://) o app é sempre demonstração, então não muda nada.
   try { if (localStorage.getItem('vx:modo') === '"demo"') localStorage.removeItem('vx:modo'); } catch (e) {}
+
+  // Endereço limpo: .../vexocar/index.html vira .../vexocar/ (só pelo servidor; pelo computador fica como está)
+  if (/^https?:$/.test(location.protocol) && /index\.html$/.test(location.pathname)) {
+    try { history.replaceState(history.state, '', location.pathname.replace(/index\.html$/, '') + location.search + location.hash); } catch (e) {}
+  }
   const calmo = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Menu fica sólido depois do topo

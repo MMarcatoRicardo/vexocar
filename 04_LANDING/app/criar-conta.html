@@ -6,6 +6,10 @@
 <title>Criar conta · VEXOcar</title>
 <meta name="theme-color" content="#0E0F11">
 <link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../img/app/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="VEXOcar">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -114,9 +118,9 @@
     d.logado = true;
     VX.salvar(d);
     VX.avisoDepois('Conta criada! Agora cadastre o seu carro.');
-    // ?ir=vitrine.html (vem da landing): depois de entrar, segue para lá. Só aceita telas do próprio app.
+    // ?ir=vitrine ou ?ir=vitrine.html (vem da landing): depois de entrar, segue para lá. Só aceita telas do próprio app.
     var ir = VX.param('ir');
-    location.href = ir && /^[a-z-]+\.html$/.test(ir) ? ir : 'garagem.html';
+    location.href = ir && /^[a-z-]+(\.html)?$/.test(ir) ? ir.replace(/(\.html)?$/, '.html') : 'garagem.html';
   }
 
   // Modo API: cria a conta de verdade (garagem vazia; os carros de exemplo ficam em Perfil > Restaurar).
@@ -128,7 +132,7 @@
     (comGoogle ? VXAPI.google() : VXAPI.criarConta(nome, email, senha, perfil)).then(function (d) {
       VX.avisoDepois(d.carros.length ? 'Bem-vindo de volta, ' + d.usuario.nome.split(' ')[0] + '!' : 'Conta criada! Agora cadastre o seu carro.');
       var ir = VX.param('ir');
-      location.href = ir && /^[a-z-]+\.html$/.test(ir) ? ir : 'garagem.html';
+      location.href = ir && /^[a-z-]+(\.html)?$/.test(ir) ? ir.replace(/(\.html)?$/, '.html') : 'garagem.html';
     }, function (e) {
       btn.disabled = false; btn.innerHTML = txt;
       if (/e-mail/i.test(e.message) && !comGoogle) { marcaErro('email', e.message); document.getElementById('email').focus(); }

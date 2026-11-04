@@ -6,6 +6,10 @@
 <title>Entrar · VEXOcar</title>
 <meta name="theme-color" content="#0E0F11">
 <link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../img/app/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="VEXOcar">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -78,9 +82,9 @@
 
   function irPara(d) {
     VX.avisoDepois('Bem-vindo, ' + d.usuario.nome.split(' ')[0] + '!');
-    // ?ir=vitrine.html (vem da landing): depois de entrar, segue para lá. Só aceita telas do próprio app.
+    // ?ir=vitrine ou ?ir=vitrine.html (vem da landing): depois de entrar, segue para lá. Só aceita telas do próprio app.
     var ir = VX.param('ir');
-    location.href = ir && /^[a-z-]+\.html$/.test(ir) ? ir : 'garagem.html';
+    location.href = ir && /^[a-z-]+(\.html)?$/.test(ir) ? ir.replace(/(\.html)?$/, '.html') : 'garagem.html';
   }
 
   // Aviso embaixo do formulário: na demonstração explica o modo; com a API mostra o erro do login.

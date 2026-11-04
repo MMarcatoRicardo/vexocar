@@ -37,7 +37,15 @@
   var ativo = porServidor && ler(K.modo) !== 'demo';
   var local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || /^192\.168\./.test(location.hostname);
   var API = local ? location.origin : API_PUBLICADA;
+  // Nome da tela com .html, aberta como garagem.html ou garagem (endereço sem .html)
   var pagina = location.pathname.split('/').pop() || 'index.html';
+  if (!/\./.test(pagina)) pagina += '.html';
+
+  // Endereço limpo: pelo servidor (GitHub Pages, Render, localhost) a barra mostra .../app/garagem, sem o .html.
+  // Os dois servidores abrem o arquivo certo sem a extensão. Pelo computador (file://) precisa do .html, então fica.
+  if (porServidor && /\.html$/.test(location.pathname)) {
+    try { history.replaceState(history.state, '', location.pathname.replace(/\.html$/, '') + location.search + location.hash); } catch (e) {}
+  }
 
   if (!ativo) {
     // demo: true = demonstração aberta pelo site (botão "Ver demonstração"), não pelos arquivos do computador
@@ -76,7 +84,7 @@
   function limparTudo() { [K.sessao, K.cache, K.base, K.fila, K.fotos].forEach(function (k) { gravar(k, null); }); }
   function irParaLogin() {
     if (PUBLICAS.indexOf(pagina) >= 0) return;
-    location.replace('entrar.html?ir=' + encodeURIComponent(pagina));
+    location.replace('entrar.html?ir=' + encodeURIComponent(pagina.replace(/\.html$/, '')));
   }
   // Tela que precisa de login e ninguém entrou: vai para o login antes de desenhar
   if (!sessao() && PUBLICAS.indexOf(pagina) < 0) irParaLogin();

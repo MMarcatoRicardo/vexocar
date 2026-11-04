@@ -382,7 +382,8 @@
   var PILHA = 'vx:pilha';
   function lerPilha() { try { return JSON.parse(sessionStorage.getItem(PILHA)) || []; } catch (e) { return []; } }
   function gravarPilha(p) { try { sessionStorage.setItem(PILHA, JSON.stringify(p.slice(-30))); } catch (e) {} }
-  function aqui() { return location.pathname.split('/').pop() + location.search; }
+  // Sempre com .html (o endereço pode estar sem a extensão), para a pilha funcionar nos dois jeitos
+  function aqui() { var n = location.pathname.split('/').pop() || 'index.html'; return (/\./.test(n) ? n : n + '.html') + location.search; }
   function ss(k, v) { try { if (v === undefined) return sessionStorage.getItem(k); if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) { return null; } }
   function registrarTela() {
     if (document.body.dataset.pilha === 'nao') { ss('vx:form', '1'); ss('vx:veioDe', null); return; }
