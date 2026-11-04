@@ -3,7 +3,7 @@
    Para voltar ao começo: Perfil > "Restaurar dados de exemplo".
    A prova de cada serviço é a nota fiscal anexada (nota: true). A oficina não usa o app (decisão de 04/11/2026). */
 window.VX_DADOS = {
-  versao: 5, // subir quando os dados de exemplo mudarem (o navegador recarrega o exemplo)
+  versao: 6, // subir quando os dados de exemplo mudarem (o navegador recarrega o exemplo)
   hoje: '2026-11-03', // data fixa para a demonstração ficar sempre igual
 
   // WhatsApp de TODOS os vendedores e oficinas de exemplo (whatsapp: 'demo').
@@ -15,7 +15,8 @@ window.VX_DADOS = {
 
   carros: [
     { id: 'c1', marca: 'Volkswagen', modelo: 'Polo', versao: '1.0 TSI Highline', ano: 2019, placa: 'BRA2E19', km: 87400, kmMes: 4200, foto: '../img/carros/polo.jpg', cor: 'Azul' },
-    { id: 'c2', marca: 'Honda', modelo: 'CR-V', versao: 'EXL 2.0', ano: 2017, placa: 'QTP4C37', km: 61050, kmMes: 1100, foto: '../img/carros/crv.jpg', cor: 'Branco' }
+    { id: 'c2', marca: 'Honda', modelo: 'CR-V', versao: 'EXL 2.0', ano: 2017, placa: 'QTP4C37', km: 61050, kmMes: 1100, foto: '../img/carros/crv.jpg', cor: 'Branco' },
+    { id: 'c3', marca: 'Toyota', modelo: 'Camry', versao: 'XLE 2.5 (Uber Black)', ano: 2019, placa: 'AYK7F21', km: 84900, kmMes: 5200, foto: '../img/carros/camry.jpg', cor: 'Preto' }
   ],
 
   // tipo: revisao | oleo | freios | pneus | suspensao | eletrica | outro
@@ -31,7 +32,13 @@ window.VX_DADOS = {
     { id: 'm9', carroId: 'c2', data: '2026-03-14', km: 58200, tipo: 'oleo', servico: 'Troca de óleo e filtro', pecas: 'Óleo 0W20, filtro de óleo', valor: 420.00, oficina: 'Auto Center Veloz', oficinaId: 'o2', nota: true },
     { id: 'm10', carroId: 'c2', data: '2025-09-20', km: 52000, tipo: 'revisao', servico: 'Revisão dos 50.000 km', pecas: 'Filtros, fluido de freio, velas', valor: 1690.00, oficina: 'Concessionária Honda', oficinaId: null, nota: true },
     { id: 'm11', carroId: 'c2', data: '2025-05-08', km: 49100, tipo: 'eletrica', servico: 'Bateria nova', pecas: 'Bateria Moura 60 Ah', valor: 610.00, oficina: 'Elétrica Curitibana', oficinaId: 'o4', nota: false },
-    { id: 'm12', carroId: 'c2', data: '2024-10-02', km: 44800, tipo: 'pneus', servico: 'Alinhamento e balanceamento', pecas: '', valor: 160.00, oficina: 'Auto Center Veloz', oficinaId: 'o2', nota: false }
+    { id: 'm12', carroId: 'c2', data: '2024-10-02', km: 44800, tipo: 'pneus', servico: 'Alinhamento e balanceamento', pecas: '', valor: 160.00, oficina: 'Auto Center Veloz', oficinaId: 'o2', nota: false },
+    { id: 'm13', carroId: 'c3', data: '2026-07-15', km: 79500, tipo: 'oleo', servico: 'Troca de óleo e filtro', pecas: 'Óleo 0W20 sintético, filtro de óleo', valor: 410.00, oficina: 'Revisa Já Água Verde', oficinaId: 'o6', nota: true },
+    { id: 'm14', carroId: 'c3', data: '2026-05-04', km: 74600, tipo: 'freios', servico: 'Pastilhas e discos dianteiros', pecas: 'Jogo de pastilhas e 2 discos', valor: 1290.00, oficina: 'Freios & Cia', oficinaId: 'o5', nota: true },
+    { id: 'm15', carroId: 'c3', data: '2026-08-20', km: 80200, tipo: 'revisao', servico: 'Revisão dos 80.000 km', pecas: 'Filtros de ar, cabine e combustível, fluido de freio', valor: 1540.00, oficina: 'Concessionária Toyota', oficinaId: null, nota: true },
+    { id: 'm16', carroId: 'c3', data: '2025-12-01', km: 66200, tipo: 'pneus', servico: 'Troca dos 4 pneus e alinhamento', pecas: '4 pneus 235/45 R18', valor: 3360.00, oficina: 'Auto Center Veloz', oficinaId: 'o2', nota: true },
+    { id: 'm17', carroId: 'c3', data: '2025-09-22', km: 62400, tipo: 'oleo', servico: 'Troca de óleo e filtro', pecas: 'Óleo 0W20 sintético, filtro de óleo', valor: 389.90, oficina: 'Revisa Já Água Verde', oficinaId: 'o6', nota: true },
+    { id: 'm18', carroId: 'c3', data: '2025-06-30', km: 58100, tipo: 'eletrica', servico: 'Ar-condicionado: carga de gás e filtro', pecas: 'Gás R134a, filtro de cabine', valor: 340.00, oficina: 'Elétrica Curitibana', oficinaId: 'o4', nota: false }
   ],
 
   // IPVA e licenciamento pagos (entram na linha do tempo; o que falta pagar vira alerta). Valores de exemplo.
@@ -42,7 +49,10 @@ window.VX_DADOS = {
     { id: 'd4', carroId: 'c1', tipo: 'licenciamento', ano: 2025, data: '2025-12-10', valor: 179.80 },
     { id: 'd5', carroId: 'c2', tipo: 'ipva', ano: 2026, data: '2026-01-17', valor: 2003.50 },
     { id: 'd6', carroId: 'c2', tipo: 'ipva', ano: 2025, data: '2025-01-15', valor: 3712.00 },
-    { id: 'd7', carroId: 'c2', tipo: 'licenciamento', ano: 2025, data: '2025-10-28', valor: 179.80 }
+    { id: 'd7', carroId: 'c2', tipo: 'licenciamento', ano: 2025, data: '2025-10-28', valor: 179.80 },
+    { id: 'd8', carroId: 'c3', tipo: 'ipva', ano: 2026, data: '2026-01-11', valor: 2870.40 },
+    { id: 'd9', carroId: 'c3', tipo: 'licenciamento', ano: 2025, data: '2025-09-16', valor: 179.80 },
+    { id: 'd10', carroId: 'c3', tipo: 'licenciamento', ano: 2026, data: '2026-04-22', valor: 186.12 }
   ],
 
   oficinas: [
@@ -89,13 +99,6 @@ window.VX_DADOS = {
         { data: '2026-10-01', km: 71800, servico: 'Pastilhas e discos de freio', nota: true, oficina: 'Freios & Cia' },
         { data: '2026-05-20', km: 66000, servico: 'Revisão dos 65.000 km', nota: true, oficina: 'Oficina do Zé' },
         { data: '2025-11-11', km: 60100, servico: 'Troca de óleo e filtro', nota: false, oficina: 'Mecânica Boa Vista' } ] },
-    { id: 'a3', marca: 'Toyota', modelo: 'Camry', versao: 'XLE 2.5', ano: 2019, km: 63000, preco: 159900, fipe: 164500, cidade: 'São José dos Pinhais, PR', categoria: 'seda', foto: '../img/carros/camry.jpg', nota: 91, manutencoes: 12, comprovadas: 10, publicado: '2026-10-21', visitas: 154,
-      vendedor: { nome: 'Carlos R.', desde: '2026-04', whatsapp: 'demo' },
-      descricao: 'Sedã executivo muito econômico na estrada. Manual e chave reserva.',
-      historico: [
-        { data: '2026-08-08', km: 61200, servico: 'Revisão dos 60.000 km', nota: true, oficina: 'Concessionária Toyota' },
-        { data: '2026-02-17', km: 55400, servico: 'Troca de óleo e filtro', nota: true, oficina: 'Auto Center Veloz' },
-        { data: '2025-08-30', km: 50300, servico: 'Revisão dos 50.000 km', nota: false, oficina: 'Concessionária Toyota' } ] },
     { id: 'a4', marca: 'Fiat', modelo: '500', versao: 'Cult 1.4', ano: 2014, km: 78400, preco: 48900, fipe: 47200, cidade: 'Curitiba, PR', categoria: 'hatch', foto: '../img/carros/fiat500.jpg', nota: 88, manutencoes: 14, comprovadas: 11, publicado: '2026-10-25', visitas: 187,
       vendedor: { nome: 'Juliana P.', desde: '2026-03', whatsapp: 'demo' },
       descricao: 'Perfeito para a cidade. Embreagem trocada em 2026, ar gelando.',
