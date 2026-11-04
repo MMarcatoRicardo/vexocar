@@ -23,3 +23,5 @@ Enunciado*.docx
 *.log
 .DS_Store
 Thumbs.db
+.env.*
+!.env.exemplo
