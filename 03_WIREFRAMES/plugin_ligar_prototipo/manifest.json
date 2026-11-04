@@ -1,0 +1,9 @@
+{
+  "name": "VEXOcar - ligar protótipo",
+  "id": "vexocar-ligar-prototipo",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": { "allowedDomains": ["none"] }
+}
