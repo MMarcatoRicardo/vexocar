@@ -16,8 +16,8 @@
 (function () {
   'use strict';
 
-  /* ===== Endereço da API publicada (Render). Troque na etapa 12, depois do deploy. ===== */
-  var API_PUBLICADA = 'https://vexocar-api.onrender.com';
+  /* ===== Endereço da API publicada (Render). Publicada na etapa 12. ===== */
+  var API_PUBLICADA = 'https://vexocar.onrender.com';
 
   var K = { fotos: 'vx:api:fotos', modo: 'vx:modo', sessao: 'vx:sessao', cache: 'vx:api:cache', base: 'vx:api:base', fila: 'vx:api:fila', cfg: 'vx:api:cfg' };
   // Coleções que são da pessoa (as outras, como oficinas e anúncios de exemplo, só se lê)
