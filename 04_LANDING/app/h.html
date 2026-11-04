@@ -91,7 +91,7 @@
     pub.innerHTML =
       '<div class="pub-capa"><img src="' + esc(c.foto) + '" alt="Foto do ' + esc(VX.nomeCarro(c)) + '"></div>' +
       '<h1>' + esc(c.marca + ' ' + c.modelo) + ' ' + c.ano + '</h1>' +
-      '<p class="mudo" style="margin-top:6px">' + esc(c.versao) + ' · <span class="placa">' + (/\*/.test(c.placa) ? esc(c.placa) : fmt.placa(c.placa)) + '</span> · ' + fmt.km(c.km) + '</p>' +
+      '<p class="mudo" style="margin-top:6px">' + (c.versao ? esc(c.versao) + ' · ' : '') + '<span class="placa">' + (/\*/.test(c.placa) ? esc(c.placa) : fmt.placa(c.placa)) + '</span> · ' + fmt.km(c.km) + '</p>' +
       '<p class="mudo peq" style="margin-top:4px">Histórico gerado em ' + fmt.data(VX.hoje()) + ' pelo VEXOcar</p>' +
 
       '<section class="cartao" style="margin-top:20px"><div class="pub-saude">' + VX.gauge(n, 'g') +
