@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VEXOcar · O prontuário digital do seu carro</title>
+<meta name="description" content="Lembra das revisões, acha oficina perto de você e, na hora de vender, vira um anúncio com histórico comprovado.">
+<meta name="theme-color" content="#0E0F11">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="img/hero.jpg">
+<link rel="stylesheet" href="css/estilo.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+
+<!-- V de pista: o mesmo desenho de 02_MARCA/vexocar-v.svg, usado em todo o logo -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="v" viewBox="18 20 84 80">
+    <polygon points="18,20 37,20 60,78 60,100 50,100" fill="#F2F1EC"/>
+    <polygon points="83,20 102,20 70,100 60,100 60,78" fill="#2FD47A"/>
+    <line class="faixa" x1="91.6" y1="23" x2="66.2" y2="97" stroke="#0E0F11" stroke-width="2.8" stroke-dasharray="8 6"/>
+  </symbol>
+  <symbol id="gh" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.530 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.690-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></symbol>
+</svg>
+
+<header class="nav" id="topo">
+  <a class="wm" href="#" aria-label="VEXOcar, início"><svg><use href="#v"/></svg>EXO<span>car</span></a>
+  <nav class="nav-links" aria-label="Seções">
+    <a href="#como">Como funciona</a>
+    <a href="#vitrine">Vitrine</a>
+    <a href="#oficinas">Oficinas</a>
+    <a href="#equipe">Equipe</a>
+  </nav>
+  <div class="nav-acoes">
+    <a class="link-entrar" href="app/entrar.html">Entrar</a>
+    <a class="btn btn-p btn-sm" href="app/criar-conta.html">Criar conta grátis</a>
+  </div>
+</header>
+
+<main>
+  <!-- HERÓI -->
+  <section class="hero">
+    <div class="hero-foto" aria-hidden="true"></div>
+    <div class="hero-sombra" aria-hidden="true"></div>
+    <div class="hero-conteudo">
+      <p class="kicker entra">Hub de manutenção e histórico veicular</p>
+      <h1 class="entra" style="--d:.1s">O prontuário digital do seu carro</h1>
+      <p class="lead entra" style="--d:.25s">Lembra das revisões, acha oficina perto de você e, na hora de vender, vira um anúncio com histórico comprovado.</p>
+      <div class="acoes entra" style="--d:.4s">
+        <a class="btn btn-p" href="app/criar-conta.html">Começar grátis <span class="seta">→</span></a>
+        <a class="btn btn-s" href="#vitrine">Ver a vitrine</a>
+      </div>
+    </div>
+
+    <aside class="hero-card entra" style="--d:.7s" aria-label="Exemplo de carro no VEXOcar">
+      <div class="gauge" data-nota="92"><svg viewBox="0 0 120 70"><path class="g-fundo" d="M10 64 A50 50 0 0 1 110 64"/><path class="g-valor" d="M10 64 A50 50 0 0 1 110 64" pathLength="100"/></svg><b>92</b></div>
+      <div>
+        <div class="hc-titulo">Honda Civic EXL 2019</div>
+        <div class="hc-sub">Nota de saúde · 14 manutenções</div>
+        <div class="hc-alerta"><i></i>Revisão dos 50.000 km em 1.680 km</div>
+      </div>
+    </aside>
+
+    <a class="rolar" href="#por-que" aria-label="Rolar para baixo"><span></span></a>
+  </section>
+
+  <!-- POR QUE USAR -->
+  <section class="sec" id="por-que">
+    <div class="cab revela">
+      <p class="kicker">Por que usar</p>
+      <h2>Seu carro tem memória.<br>Agora ela cabe no bolso.</h2>
+    </div>
+    <div class="grade3">
+      <article class="card revela">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
+        <h3>Nunca mais esqueça a revisão</h3>
+        <p>Alerta por km e por data, mais IPVA e licenciamento pelo final da placa.</p>
+      </article>
+      <article class="card revela" style="--d:.1s">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m9 15 2 2 4-4"/></svg></div>
+        <h3>Histórico que vale dinheiro</h3>
+        <p>Toda manutenção com nota e foto. Na venda, vira PDF e selo de confiança.</p>
+      </article>
+      <article class="card revela" id="oficinas" style="--d:.2s">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <h3>Oficina perto de você</h3>
+        <p>Mapa com oficinas reais perto de você, avaliadas por quem usa, com horário e WhatsApp.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- FAIXA CINEMATOGRÁFICA -->
+  <section class="faixa-foto" aria-label="Oficina">
+    <div class="ff-img" style="background-image:url(img/oficina.jpg)" data-parallax></div>
+    <div class="ff-texto revela">
+      <p class="kicker">Comprovado com nota fiscal</p>
+      <p class="frase">Cada serviço registrado com data, km, peças e a foto da nota fiscal. Com a nota anexada, ele entra como comprovado no histórico.</p>
+    </div>
+  </section>
+
+  <!-- COMO FUNCIONA -->
+  <section class="sec" id="como">
+    <div class="cab revela">
+      <p class="kicker">Como funciona</p>
+      <h2>Três passos. Do cadastro à venda.</h2>
+    </div>
+    <ol class="passos">
+      <li class="pista" aria-hidden="true"><span></span></li>
+      <li class="passo revela">
+        <span class="num">1</span>
+        <h3>Cadastre seu carro</h3>
+        <p>Placa, modelo, ano e km. Leva 1 minuto.</p>
+      </li>
+      <li class="passo revela" style="--d:.15s">
+        <span class="num">2</span>
+        <h3>Registre cada manutenção</h3>
+        <p>Data, km, serviço, valor e foto da nota.</p>
+      </li>
+      <li class="passo revela" style="--d:.3s">
+        <span class="num">3</span>
+        <h3>Venda com histórico</h3>
+        <p>Anuncie na vitrine com selo e nota de saúde.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- VITRINE: apresenta a função (anunciar ou consultar), sem listar carros -->
+  <section class="sec" id="vitrine">
+    <div class="vit">
+      <div class="vit-texto">
+        <div class="cab revela">
+          <p class="kicker">Vitrine VEXOcar</p>
+          <h2>Compre e venda com o histórico na mão.</h2>
+          <p class="cab-lead">Na vitrine, todo carro leva junto o prontuário: as manutenções, a nota de saúde e o preço comparado à tabela FIPE. Quem compra sabe o que está levando.</p>
+        </div>
+        <div class="caminhos">
+          <a class="caminho revela" href="app/entrar.html?ir=anunciar.html">
+            <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2v13"/><path d="m7 7 5-5 5 5"/><path d="M20 15v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4"/></svg></div>
+            <div><h3>Quer vender?</h3><p>Anuncie o seu carro com o histórico que você já registrou. O selo e a nota vão junto.</p></div>
+            <span class="seta">→</span>
+          </a>
+          <a class="caminho revela" href="app/entrar.html?ir=vitrine.html" style="--d:.1s">
+            <div class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
+            <div><h3>Quer comprar?</h3><p>Consulte os carros anunciados, filtre por preço e nota e fale com o dono pelo WhatsApp.</p></div>
+            <span class="seta">→</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="vit-visual revela" style="--d:.15s" aria-hidden="true">
+        <div class="vv-foto vv-tras"><img src="img/vitrine-camaro.jpg" alt="" loading="lazy"></div>
+        <div class="vv-foto vv-frente"><img src="img/vitrine-q5.jpg" alt="" loading="lazy"></div>
+        <div class="vv-chip vv-nota">
+          <div class="gauge gauge-p" data-nota="95"><svg viewBox="0 0 120 70"><path class="g-fundo" d="M10 64 A50 50 0 0 1 110 64"/><path class="g-valor" d="M10 64 A50 50 0 0 1 110 64" pathLength="100"/></svg><b>95</b></div>
+          <div><strong>Nota de saúde</strong><span>revisões em dia</span></div>
+        </div>
+        <div class="vv-chip vv-selo"><span class="selo"><svg><use href="#v"/></svg>Histórico VEXOcar</span><span>14 manutenções · 11 com nota fiscal</span></div>
+        <div class="vv-chip vv-fipe"><strong>2% abaixo da FIPE</strong><span>preço comparado na hora</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DADO DA PESQUISA -->
+  <!-- 79% = parcial. Trocar data-alvo e o texto pelo número final depois de 13/11 (etapa 10). -->
+  <section class="dado" aria-label="Dado da pesquisa">
+    <div class="ff-img" style="background-image:url(img/garagem.jpg)" data-parallax></div>
+    <div class="dado-conteudo revela">
+      <div class="dado-num"><span class="contador" data-alvo="79">0</span>%</div>
+      <h2>dos motoristas querem um histórico do carro</h2>
+      <p>Pesquisa VEXOcar com motoristas de aplicativo e donos de carro, novembro de 2026.</p>
+      <a class="btn btn-p" href="app/criar-conta.html">Criar conta grátis <span class="seta">→</span></a>
+    </div>
+  </section>
+
+  <!-- EQUIPE
+       Cada integrante confere o próprio cartão. Para pôr a foto do GitHub:
+       salve a foto em img/equipe/<nome>.jpg e descomente a linha <img> do seu cartão.
+       Para o botão do GitHub/LinkedIn: descomente a linha e troque SEU-USUARIO. -->
+  <section class="sec" id="equipe">
+    <div class="cab revela">
+      <p class="kicker">Quem faz o VEXOcar</p>
+      <h2>Três pessoas, um carro de cada vez.</h2>
+      <p class="cab-lead">Projeto Integrador de Design Profissional na Universidade Positivo. Cada um puxou uma frente, e os três programaram.</p>
+    </div>
+    <div class="grade3">
+      <article class="pessoa revela">
+        <div class="foto"><span>RM</span><img src="img/equipe/ricardo.jpg" alt="Foto de Ricardo Medeiros Marcato" loading="lazy" onerror="this.remove()"></div>
+        <p class="papel">Tech Lead e Marca</p>
+        <h3>Ricardo Medeiros Marcato</h3>
+        <p class="rgm">RGM 47427400 · Engenharia de Software</p>
+        <p class="bio">Criou a marca VEXOcar e cuidou da arquitetura, do banco de dados, do login e da publicação do sistema.</p>
+        <div class="links">
+          <a href="https://github.com/MMarcatoRicardo" target="_blank" rel="noopener" aria-label="GitHub do Ricardo"><svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+          <a href="https://www.linkedin.com/in/ricardo-medeiros-marcato/" target="_blank" rel="noopener" aria-label="LinkedIn do Ricardo"><svg viewBox="0 0 16 16"><path d="M0 1.15C0 .52.52 0 1.17 0h13.66C15.48 0 16 .52 16 1.15v13.7c0 .63-.52 1.15-1.17 1.15H1.17C.52 16 0 15.48 0 14.85V1.15zm4.94 12.24V6.17H2.54v7.22h2.4zM3.74 5.18c.84 0 1.36-.55 1.36-1.25-.02-.71-.52-1.25-1.34-1.25-.82 0-1.36.54-1.36 1.25 0 .7.52 1.25 1.33 1.25h.01zm4.91 8.21V9.36c0-.22.02-.43.08-.59.17-.43.57-.88 1.23-.88.87 0 1.22.66 1.22 1.63v3.87h2.4V9.25c0-2.22-1.18-3.25-2.77-3.25-1.28 0-1.84.7-2.16 1.2h.02V6.17h-2.4c.03.68 0 7.22 0 7.22h2.38z"/></svg>LinkedIn</a>
+        </div>
+      </article>
+      <article class="pessoa revela" style="--d:.1s">
+        <div class="foto"><span>DC</span><img src="img/equipe/daniel.jpg" alt="Foto de Daniel Ribeiro da Costa" loading="lazy" onerror="this.remove()"></div>
+        <p class="papel">UX/UI e Protótipo</p>
+        <h3>Daniel Ribeiro da Costa</h3>
+        <p class="rgm">RGM 47282487 · Engenharia de Software</p>
+        <p class="bio">Responsável pelas telas: experiência de uso, protótipo navegável e o front-end do sistema.</p>
+        <div class="links">
+          <a href="https://github.com/Dev-daniel-01" target="_blank" rel="noopener" aria-label="GitHub do Daniel"><svg viewBox="0 0 16 16"><use href="#gh"/></svg>GitHub</a>
+          <a href="https://www.linkedin.com/in/devdaniel01/" target="_blank" rel="noopener" aria-label="LinkedIn do Daniel"><svg viewBox="0 0 16 16"><path d="M0 1.15C0 .52.52 0 1.17 0h13.66C15.48 0 16 .52 16 1.15v13.7c0 .63-.52 1.15-1.17 1.15H1.17C.52 16 0 15.48 0 14.85V1.15zm4.94 12.24V6.17H2.54v7.22h2.4zM3.74 5.18c.84 0 1.36-.55 1.36-1.25-.02-.71-.52-1.25-1.34-1.25-.82 0-1.360.54-1.36 1.25 0 .7.52 1.25 1.33 1.25h.01zm4.91 8.21V9.36c0-.22.02-.43.08-.59.17-.43.57-.88 1.23-.88.87 0 1.22.66 1.22 1.63v3.87h2.4V9.25c0-2.22-1.18-3.25-2.77-3.25-1.28 0-1.84.7-2.16 1.2h.02V6.17h-2.4c.03.68 0 7.22 0 7.22h2.38z"/></svg>LinkedIn</a>
+          <a href="https://profile-hazel-zeta.vercel.app/" target="_blank" rel="noopener" aria-label="Portfólio do Daniel"><svg viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm5.9 7.2h-2.4a12 12 0 0 0-1-4.6 6.4 6.4 0 0 1 3.4 4.6ZM8 1.7c.7.9 1.6 2.7 1.8 5.5H6.2C6.4 4.4 7.3 2.6 8 1.7ZM5.5 2.6a12 12 0 0 0-1 4.6H2.1a6.4 6.4 0 0 1 3.4-4.6ZM2.1 8.8h2.4a12 12 0 0 0 1 4.6 6.4 6.4 0 0 1-3.4-4.6ZM8 14.3c-.7-.9-1.6-2.7-1.8-5.5h3.6c-.2 2.8-1.1 4.6-1.8 5.5Zm2.5-.9a12 12 0 0 0 1-4.6h2.4a6.4 6.4 0 0 1-3.4 4.6Z"/></svg>Portfólio</a>
+        </div>
+      </article>
+      <article class="pessoa revela" style="--d:.2s">
+        <!-- Foto do Lucas: salvar em img/equipe/lucas.jpg. Sem o arquivo, ficam as iniciais. -->
+        <div class="foto"><span>LC</span><img src="img/equipe/lucas.jpg" alt="Foto de Lucas Markovicz Costa" loading="lazy" onerror="this.remove()"></div>
+        <p class="papel">Pesquisa e Produto (PO)</p>
+        <h3>Lucas Markovicz Costa</h3>
+        <p class="rgm">RGM 47454547 · Sistemas de Informação</p>
+        <p class="bio">Conduziu a pesquisa com motoristas e donos de carro, definiu as prioridades do produto e fez a API e o relatório.</p>
+        <div class="links">
+          <a href="https://github.com/Lucasmkz" target="_blank" rel="noopener" aria-label="GitHub do Lucas"><svg viewBox="0 0 16 16"><use href="#gh"/></svg>GitHub</a>
+          <a href="https://www.linkedin.com/in/lucasmarkoviczcosta/" target="_blank" rel="noopener" aria-label="LinkedIn do Lucas"><svg viewBox="0 0 16 16"><path d="M0 1.15C0 .52.52 0 1.17 0h13.66C15.48 0 16 .52 16 1.15v13.7c0 .63-.52 1.150-1.17 1.15H1.17C.52 16 0 15.48 0 14.85V1.15zm4.94 12.24V6.17H2.54v7.22h2.4zM3.74 5.18c.84 0 1.36-.55 1.36-1.25-.02-.71-.52-1.25-1.34-1.25-.82 0-1.36.54-1.36 1.25 0 .7.52 1.25 1.33 1.25h.01zm4.91 8.21V9.36c0-.22.02-.43.08-.59.17-.43.57-.88 1.23-.88.87 0 1.22.66 1.22 1.63v3.87h2.4V9.25c0-2.22-1.18-3.25-2.77-3.25-1.28 0-1.84.7-2.16 1.2h.02V6.17h-2.4c.03.68 0 7.22 0 7.22h2.38z"/></svg>LinkedIn</a>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="rodape">
+  <a class="wm wm-p" href="#" aria-label="VEXOcar, voltar ao topo"><svg><use href="#v"/></svg>EXO<span>car</span></a>
+  <nav aria-label="Rodapé">
+    <a href="#por-que">Sobre</a>
+    <a href="#equipe">Equipe</a>
+    <a href="mailto:contato@vexocar.com.br">Contato</a>
+    <a href="app/termos.html">Termos e privacidade</a>
+  </nav>
+  <p class="creditos">Projeto Integrador · Universidade Positivo · 2026 · Fotos: Unsplash</p>
+</footer>
+
+<script src="js/landing.js"></script>
+</body>
+</html>
