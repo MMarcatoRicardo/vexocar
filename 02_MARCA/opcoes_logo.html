@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>VEXOcar - opções de logo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Inter:wght@400;500;600&display=block" rel="stylesheet">
+<style>
+  :root{
+    --grafite:#0E0F11; --grafite-2:#1A1C20; --linha:#2A2D33;
+    --off:#F2F1EC; --verde:#2FD47A; --ambar:#F5A524; --cinza:#8A8F98;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:#16181B;color:var(--off);font-family:Inter,sans-serif;padding:40px 48px;width:1500px}
+  h1{font-family:Michroma;font-size:22px;letter-spacing:.04em;margin-bottom:6px}
+  .sub{color:var(--cinza);font-size:14px;margin-bottom:28px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .card{background:var(--grafite);border:1px solid var(--linha);border-radius:14px;overflow:hidden}
+  .head{padding:16px 20px;border-bottom:1px solid var(--linha)}
+  .head b{font-family:Michroma;font-size:15px;letter-spacing:.03em}
+  .head p{color:var(--cinza);font-size:13px;margin-top:6px;line-height:1.45}
+  .hero{height:230px;display:flex;align-items:center;justify-content:center;background:var(--grafite)}
+  .hero svg{width:150px;height:150px}
+  .lock{display:flex;align-items:center;gap:12px;padding:22px 20px}
+  .lock svg{width:46px;height:46px;flex:none}
+  .wm{font-family:Michroma;font-size:27px;letter-spacing:.02em;line-height:1}
+  .wm span{color:var(--verde)}
+  .dark{background:var(--grafite-2)}
+  .light{background:var(--off);color:var(--grafite)}
+  .light .wm span{color:#13914E}
+  .icons{display:flex;align-items:flex-end;gap:22px;padding:20px;border-top:1px solid var(--linha)}
+  .app{width:84px;height:84px;border-radius:20px;background:var(--grafite);border:1px solid var(--linha);display:flex;align-items:center;justify-content:center}
+  .app svg{width:56px;height:56px}
+  .app.g{background:var(--verde);border:0}
+  .fav{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--cinza);font-size:11px}
+  .fav svg{display:block}
+  .tag{font-size:11px;color:var(--cinza);text-align:center;margin-top:6px}
+  .paleta{display:flex;gap:10px;margin-top:28px;align-items:center;font-size:12px;color:var(--cinza)}
+  .sw{width:28px;height:28px;border-radius:6px;border:1px solid var(--linha)}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- A: chave de boca na diagonal -->
+    <mask id="mA" maskUnits="userSpaceOnUse" x="-20" y="-20" width="160" height="160">
+      <rect x="-20" y="-20" width="160" height="160" fill="#fff"/>
+      <polygon points="51,-4 69,-4 69,24 60,30 51,24" fill="#000"/>
+      <circle cx="60" cy="100" r="4.5" fill="#000"/>
+    </mask>
+    <symbol id="sA" viewBox="0 0 120 120">
+      <g transform="rotate(45 60 60)">
+        <g mask="url(#mA)" fill="var(--cor, #2FD47A)">
+          <circle cx="60" cy="28" r="23"/>
+          <rect x="51" y="38" width="18" height="74" rx="9"/>
+        </g>
+      </g>
+    </symbol>
+
+    <!-- B: V de pista -->
+    <symbol id="sB" viewBox="0 0 120 120">
+      <polygon points="18,20 40,20 61,80 56,100 46,100" fill="var(--cor2, #F2F1EC)"/>
+      <polygon points="80,20 102,20 74,100 62,100 61,80" fill="var(--cor, #2FD47A)"/>
+      <line x1="91" y1="24" x2="70" y2="96" stroke="var(--fundo, #0E0F11)" stroke-width="3" stroke-dasharray="9 7"/>
+    </symbol>
+
+    <!-- C: chave com encaixe em V -->
+    <mask id="mC" maskUnits="userSpaceOnUse" x="-20" y="-20" width="160" height="160">
+      <rect x="-20" y="-20" width="160" height="160" fill="#fff"/>
+      <polygon points="43,2 77,2 60,31" fill="#000"/>
+      <circle cx="60" cy="100" r="4.5" fill="#000"/>
+    </mask>
+    <symbol id="sC" viewBox="0 0 120 120">
+      <g transform="rotate(-24 60 60)">
+        <g mask="url(#mC)" fill="var(--cor, #2FD47A)">
+          <circle cx="60" cy="34" r="27"/>
+          <path d="M51 52 L69 52 L68 104 A8 8 0 0 1 52 104 Z"/>
+        </g>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<h1>VEXOcar · opções de símbolo</h1>
+<p class="sub">Cada opção em fundo escuro, fundo claro, ícone de app e favicon (32 e 16 px, o tamanho da aba do navegador).</p>
+
+<div class="grid">
+
+  <!-- A -->
+  <div class="card">
+    <div class="head"><b>A · Chave de boca</b>
+      <p>A ferramenta mais reconhecível de oficina. Leitura imediata de "manutenção". Mais literal.</p></div>
+    <div class="hero"><svg><use href="#sA"/></svg></div>
+    <div class="lock dark"><svg><use href="#sA"/></svg><div class="wm">VEXO<span>car</span></div></div>
+    <div class="lock light" style="--cor:#13914E"><svg><use href="#sA"/></svg><div class="wm">VEXO<span>car</span></div></div>
+    <div class="icons">
+      <div><div class="app"><svg><use href="#sA"/></svg></div><div class="tag">app</div></div>
+      <div><div class="app g" style="--cor:#0E0F11"><svg><use href="#sA"/></svg></div><div class="tag">app verde</div></div>
+      <div class="fav"><svg width="32" height="32" style="background:#0E0F11;border-radius:6px"><use href="#sA"/></svg>32</div>
+      <div class="fav"><svg width="16" height="16" style="background:#0E0F11;border-radius:3px"><use href="#sA"/></svg>16</div>
+    </div>
+  </div>
+
+  <!-- B -->
+  <div class="card">
+    <div class="head"><b>B · V de pista</b>
+      <p>O "V" de VEXO: uma perna clara, a outra verde com a faixa da estrada. Fala mais de carro e velocidade do que de oficina.</p></div>
+    <div class="hero"><svg><use href="#sB"/></svg></div>
+    <div class="lock dark" style="--fundo:#1A1C20"><svg><use href="#sB"/></svg><div class="wm">VEXO<span>car</span></div></div>
+    <div class="lock light" style="--cor:#13914E;--cor2:#0E0F11;--fundo:#F2F1EC"><svg><use href="#sB"/></svg><div class="wm">VEXO<span>car</span></div></div>
+    <div class="icons">
+      <div><div class="app"><svg><use href="#sB"/></svg></div><div class="tag">app</div></div>
+      <div><div class="app g" style="--cor:#0E0F11;--cor2:#F2F1EC;--fundo:#2FD47A"><svg><use href="#sB"/></svg></div><div class="tag">app verde</div></div>
+      <div class="fav"><svg width="32" height="32" style="background:#0E0F11;border-radius:6px"><use href="#sB"/></svg>32</div>
+      <div class="fav"><svg width="16" height="16" style="background:#0E0F11;border-radius:3px"><use href="#sB"/></svg>16</div>
+    </div>
+  </div>
+
+  <!-- C -->
+  <div class="card">
+    <div class="head"><b>C · Chave em V</b>
+      <p>Mistura das duas: uma chave de boca cujo encaixe forma o "V" de VEXO. Fala de manutenção e carrega a marca.</p></div>
+    <div class="hero"><svg><use href="#sC"/></svg></div>
+    <div class="lock dark"><svg><use href="#sC"/></svg><div class="wm">VEXO<span>car</span></div></div>
+    <div class="lock light" style="--cor:#13914E"><svg><use href="#sC"/></svg><div class="wm">VEXO<span>car</span></div></div>
+    <div class="icons">
+      <div><div class="app"><svg><use href="#sC"/></svg></div><div class="tag">app</div></div>
+      <div><div class="app g" style="--cor:#0E0F11"><svg><use href="#sC"/></svg></div><div class="tag">app verde</div></div>
+      <div class="fav"><svg width="32" height="32" style="background:#0E0F11;border-radius:6px"><use href="#sC"/></svg>32</div>
+      <div class="fav"><svg width="16" height="16" style="background:#0E0F11;border-radius:3px"><use href="#sC"/></svg>16</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="paleta">
+  <div class="sw" style="background:#0E0F11"></div>grafite #0E0F11
+  <div class="sw" style="background:#F2F1EC"></div>off-white #F2F1EC
+  <div class="sw" style="background:#2FD47A"></div>verde-pista #2FD47A
+  <div class="sw" style="background:#F5A524"></div>âmbar (só alertas) #F5A524
+  &nbsp;·&nbsp; títulos em Michroma, texto em Inter
+</div>
+
+</body>
+</html>

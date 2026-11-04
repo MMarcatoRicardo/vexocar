@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>VEXOcar - logo</title>
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Inter:wght@400;500;600&display=block" rel="stylesheet">
+<style>
+  :root{--grafite:#0E0F11;--grafite-2:#1A1C20;--linha:#2A2D33;--off:#F2F1EC;--verde:#2FD47A;--verde-esc:#13914E;--cinza:#8A8F98}
+  *{box-sizing:border-box;margin:0}
+  body{background:#16181B;color:var(--off);font-family:Inter,sans-serif;padding:40px 48px;width:1500px}
+  h1{font-family:Michroma;font-size:22px;margin-bottom:6px}
+  .sub{color:var(--cinza);font-size:14px;margin-bottom:28px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+  .tile{border-radius:14px;border:1px solid var(--linha);padding:44px 40px;display:flex;flex-direction:column;gap:30px;align-items:flex-start;justify-content:center}
+  .tile.dark{background:var(--grafite)}
+  .tile.light{background:var(--off);color:var(--grafite);--cor:var(--verde-esc);--cor2:var(--grafite);--fundo:var(--off)}
+  .tile.verde{background:var(--verde);color:var(--grafite);--cor:var(--grafite);--cor2:var(--grafite);--fundo:var(--verde)}
+  .tile.verde .wm span{color:var(--grafite)}
+  .tile.light .wm span{color:var(--verde-esc)}
+  .lbl{font-size:12px;color:var(--cinza);letter-spacing:.04em;text-transform:uppercase}
+  .tile.light .lbl,.tile.verde .lbl{color:#555}
+
+  /* wordmark: o V e o simbolo, o resto e Michroma */
+  .wm{font-family:Michroma;line-height:1;letter-spacing:.02em;white-space:nowrap;display:inline-flex;align-items:baseline}
+  .wm svg{height:.755em;width:.793em;margin-right:.06em;overflow:visible}
+  .wm span{color:var(--verde)}
+  .s96{font-size:96px}.s48{font-size:48px}.s24{font-size:24px}.s14{font-size:14px}
+  .sizes{display:flex;align-items:baseline;gap:36px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- V do nome: pernas na espessura da Michroma -->
+    <symbol id="v" viewBox="18 20 84 80">
+      <polygon points="18,20 32,20 60,85 60,100 52,100" fill="var(--cor2, #F2F1EC)"/>
+      <polygon points="88,20 102,20 68,100 60,100 60,85" fill="var(--cor, #2FD47A)"/>
+      <line x1="95" y1="22" x2="65.5" y2="97" stroke="var(--fundo, #0E0F11)" stroke-width="2.4" stroke-dasharray="7 6"/>
+    </symbol>
+    <!-- tamanho pequeno: sem a faixa (some abaixo de 24 px) -->
+    <symbol id="vp" viewBox="18 20 84 80">
+      <polygon points="18,20 32,20 60,85 60,100 52,100" fill="var(--cor2, #F2F1EC)"/>
+      <polygon points="88,20 102,20 68,100 60,100 60,85" fill="var(--cor, #2FD47A)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<h1>VEXOcar · logo com o V de pista</h1>
+<p class="sub">O "V" do nome é o próprio símbolo, na espessura das letras. Abaixo de 24 px a faixa tracejada sai (ela some de tão pequena).</p>
+
+<div class="row">
+  <div class="tile dark">
+    <div class="lbl">Principal · fundo escuro</div>
+    <div class="wm s96"><svg><use href="#v"/></svg>EXO<span>car</span></div>
+    <div class="sizes">
+      <div class="wm s48"><svg><use href="#v"/></svg>EXO<span>car</span></div>
+      <div class="wm s24"><svg><use href="#vp"/></svg>EXO<span>car</span></div>
+      <div class="wm s14"><svg><use href="#vp"/></svg>EXO<span>car</span></div>
+    </div>
+  </div>
+  <div class="tile light">
+    <div class="lbl">Fundo claro</div>
+    <div class="wm s96"><svg><use href="#v"/></svg>EXO<span>car</span></div>
+    <div class="sizes">
+      <div class="wm s48"><svg><use href="#v"/></svg>EXO<span>car</span></div>
+      <div class="wm s24"><svg><use href="#vp"/></svg>EXO<span>car</span></div>
+      <div class="wm s14"><svg><use href="#vp"/></svg>EXO<span>car</span></div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="tile dark" style="--fundo:#0E0F11">
+    <div class="lbl">Variação monocromática (off-white)</div>
+    <div class="wm s48" style="--cor:#F2F1EC"><svg><use href="#v"/></svg>EXO<span style="color:#F2F1EC">car</span></div>
+    <div class="lbl" style="margin-top:6px">Variação sem "car" em verde</div>
+    <div class="wm s48"><svg><use href="#v"/></svg>EXO<span style="color:#F2F1EC">car</span></div>
+  </div>
+  <div class="tile verde">
+    <div class="lbl">Sobre o verde (capa, botão grande)</div>
+    <div class="wm s48"><svg><use href="#v"/></svg>EXO<span>car</span></div>
+    <div class="wm s24"><svg><use href="#vp"/></svg>EXO<span>car</span></div>
+  </div>
+</div>
+</body>
+</html>

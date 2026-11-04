@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>VEXOcar - opções de fonte</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,800&family=Saira:ital,wght@1,700&family=Chakra+Petch:ital,wght@1,700&family=Unbounded:wght@600&family=Barlow:ital,wght@1,700&family=Audiowide&family=Inter:wght@400;500;600&display=block" rel="stylesheet">
+<style>
+  :root{--grafite:#0E0F11;--grafite-2:#1A1C20;--linha:#2A2D33;--off:#F2F1EC;--verde:#2FD47A;--cinza:#8A8F98}
+  *{box-sizing:border-box;margin:0}
+  body{background:#16181B;color:var(--off);font-family:Inter,sans-serif;padding:36px 48px;width:1500px}
+  h1{font-family:Inter;font-weight:600;font-size:22px;margin-bottom:6px}
+  .sub{color:var(--cinza);font-size:14px;margin-bottom:24px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .tile{background:var(--grafite);border:1px solid var(--linha);border-radius:14px;padding:26px 34px 24px}
+  .lbl{font-size:12px;color:var(--cinza);letter-spacing:.04em;text-transform:uppercase;margin-bottom:22px;display:flex;justify-content:space-between}
+  .lbl b{color:var(--off);font-weight:600}
+  .wm{font-family:var(--f);font-weight:var(--w);font-style:var(--st,normal);font-size:76px;line-height:1;white-space:nowrap;display:inline-flex;align-items:baseline;letter-spacing:var(--ls,0)}
+  .wm svg{height:var(--cap);width:calc(var(--cap) * var(--vr,1.05));margin-right:var(--gap,.03em);overflow:visible;transform:skewX(var(--sk,0deg));transform-origin:bottom}
+  .wm span{color:var(--verde)}
+  .ui{margin-top:22px;padding-top:18px;border-top:1px solid var(--linha);display:flex;gap:28px;align-items:baseline}
+  .ui .t{font-family:var(--f);font-weight:var(--w);font-style:var(--st,normal);font-size:26px;letter-spacing:var(--ls,0)}
+  .ui .b{font-size:14px;color:var(--cinza);line-height:1.5}
+  .ui .b em{font-style:normal;color:var(--verde);font-family:var(--f);font-weight:var(--w)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="vb" viewBox="18 20 84 80">
+      <polygon points="18,20 37,20 60,78 60,100 50,100" fill="#F2F1EC"/>
+      <polygon points="83,20 102,20 70,100 60,100 60,78" fill="#2FD47A"/>
+      <line x1="91.6" y1="23" x2="66.2" y2="97" stroke="#0E0F11" stroke-width="2.8" stroke-dasharray="8 6"/>
+    </symbol>
+    <symbol id="vm" viewBox="18 20 84 80">
+      <polygon points="18,20 34,20 60,82 60,100 51,100" fill="#F2F1EC"/>
+      <polygon points="86,20 102,20 69,100 60,100 60,82" fill="#2FD47A"/>
+      <line x1="94" y1="23" x2="65.6" y2="97" stroke="#0E0F11" stroke-width="2.6" stroke-dasharray="8 6"/>
+    </symbol>
+  </defs>
+</svg>
+
+<h1>VEXOcar · 6 fontes para o nome</h1>
+<p class="sub">O V de pista ajustado ao peso e à inclinação de cada fonte. Abaixo, um título de tela do sistema na mesma fonte, com o texto corrido em Inter.</p>
+
+<div class="grid">
+
+  <div class="tile" style="--f:'Exo 2';--w:800;--st:italic;--cap:.70em;--sk:-11deg;--vr:1.0">
+    <div class="lbl"><span><b>1 · Exo 2</b> ExtraBold Itálico</span><span>esportiva, e o nome já tem "Exo"</span></div>
+    <div class="wm"><svg><use href="#vb"/></svg>EXO<span>car</span></div>
+    <div class="ui"><div class="t">Minha garagem</div><div class="b">Próxima revisão em <em>1.240 km</em><br>Troca de óleo · Oficina do Zé</div></div>
+  </div>
+
+  <div class="tile" style="--f:'Saira';--w:700;--st:italic;--cap:.70em;--sk:-10deg;--vr:1.0">
+    <div class="lbl"><span><b>2 · Saira</b> Bold Itálico</span><span>cara de painel de corrida</span></div>
+    <div class="wm"><svg><use href="#vb"/></svg>EXO<span>car</span></div>
+    <div class="ui"><div class="t">Minha garagem</div><div class="b">Próxima revisão em <em>1.240 km</em><br>Troca de óleo · Oficina do Zé</div></div>
+  </div>
+
+  <div class="tile" style="--f:'Chakra Petch';--w:700;--st:italic;--cap:.70em;--sk:-10deg;--vr:1.0">
+    <div class="lbl"><span><b>3 · Chakra Petch</b> Bold Itálico</span><span>cantos chanfrados, mecânica</span></div>
+    <div class="wm"><svg><use href="#vb"/></svg>EXO<span>car</span></div>
+    <div class="ui"><div class="t">Minha garagem</div><div class="b">Próxima revisão em <em>1.240 km</em><br>Troca de óleo · Oficina do Zé</div></div>
+  </div>
+
+  <div class="tile" style="--f:'Unbounded';--w:600;--cap:.74em;--vr:1.1;--ls:-.01em">
+    <div class="lbl"><span><b>4 · Unbounded</b> SemiBold</span><span>moderna, larga, com presença</span></div>
+    <div class="wm"><svg><use href="#vb"/></svg>EXO<span>car</span></div>
+    <div class="ui"><div class="t">Minha garagem</div><div class="b">Próxima revisão em <em>1.240 km</em><br>Troca de óleo · Oficina do Zé</div></div>
+  </div>
+
+  <div class="tile" style="--f:'Barlow';--w:700;--st:italic;--cap:.70em;--sk:-10deg;--vr:.98">
+    <div class="lbl"><span><b>5 · Barlow</b> Bold Itálico</span><span>sóbria, de placa de estrada</span></div>
+    <div class="wm"><svg><use href="#vm"/></svg>EXO<span>car</span></div>
+    <div class="ui"><div class="t">Minha garagem</div><div class="b">Próxima revisão em <em>1.240 km</em><br>Troca de óleo · Oficina do Zé</div></div>
+  </div>
+
+  <div class="tile" style="--f:'Audiowide';--w:400;--cap:.71em;--vr:1.02">
+    <div class="lbl"><span><b>6 · Audiowide</b></span><span>retrô de corrida, bem marcante</span></div>
+    <div class="wm"><svg><use href="#vb"/></svg>EXO<span>car</span></div>
+    <div class="ui"><div class="t">Minha garagem</div><div class="b">Próxima revisão em <em>1.240 km</em><br>Troca de óleo · Oficina do Zé</div></div>
+  </div>
+
+</div>
+</body>
+</html>
