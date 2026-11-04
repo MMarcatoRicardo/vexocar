@@ -11,6 +11,7 @@ Segmento: **4. Hub Digital de Manutenção e Histórico Veicular**.
 |---|---|
 | Site e app | https://mmarcatoricardo.github.io/vexocar/ |
 | App direto | https://mmarcatoricardo.github.io/vexocar/app/entrar.html |
+| Demonstração (sem criar conta, 3 carros de exemplo) | https://mmarcatoricardo.github.io/vexocar/app/demo.html |
 | API | https://vexocar.onrender.com/api/saude |
 
 > A API roda no plano grátis do Render, que "dorme" depois de 15 minutos parado. O primeiro acesso pode levar
