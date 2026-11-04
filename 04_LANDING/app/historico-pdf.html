@@ -97,7 +97,8 @@
   var d = VX.db(), esc = VX.esc, fmt = VX.fmt;
   var c = VX.carro(d, VX.param('id')) || d.carros[0];
   if (!c) location.replace('garagem.html');
-  var link = new URL('h.html?id=' + c.id, location.href).href;
+  // Na demonstração pelo site, o QR leva o modo junto: o celular de quem escaneia abre o mesmo carro de exemplo
+  var link = new URL('h.html?id=' + c.id + (VXAPI.demo ? '&modo=demo' : ''), location.href).href;
   document.getElementById('voltar').href = 'carro.html?id=' + c.id;
   document.title = 'Histórico ' + VX.nomeCurto(c) + ' · VEXOcar';
 

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demonstração · VEXOcar</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<!-- Porta de entrada da demonstração (botão "Ver demonstração" da landing e do login).
+     Liga o modo demo neste navegador, recomeça a conta de exemplo (3 carros, histórico, alertas)
+     e abre a garagem. Ninguém precisa criar conta e nada vai para o banco de verdade. -->
+<main class="centro" style="min-height:100vh;display:grid;place-items:center;padding:24px">
+  <p class="mudo">Abrindo a demonstração...</p>
+  <noscript><p>Ative o JavaScript para ver a demonstração.</p></noscript>
+</main>
+<script src="js/dados.js"></script>
+<script>
+  try { localStorage.setItem('vx:modo', JSON.stringify('demo')); } catch (e) {}
+</script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  VX.restaurar();
+  try { sessionStorage.clear(); } catch (e) {}
+  location.replace('garagem.html');
+</script>
+</body>
+</html>

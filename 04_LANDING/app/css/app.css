@@ -310,6 +310,34 @@ a.aviso:hover { border-color: var(--ambar); }
   .shell .conteudo { margin: 0; padding: 0; max-width: none; }
 }
 
+/* ---------- Selo da demonstração pelo site (js/api.js > seloDemo) ---------- */
+/* celular: faixa acima da barra de baixo; PC com menu lateral: cartão no menu; PC sem menu: pílula no canto */
+.selo-demo { position: fixed; z-index: 45; left: 0; right: 0; bottom: var(--barra); display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px 8px 16px; background: #1F1A10; border-top: 1px solid rgba(245, 165, 36, .45); font-size: 13px; color: var(--off2); }
+.selo-txt { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.selo-tag { flex: none; padding: 3px 8px; border-radius: 999px; background: var(--ambar); color: var(--grafite); font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.selo-acoes { display: flex; align-items: center; gap: 12px; flex: none; }
+.selo-conta { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px; background: var(--verde); color: var(--grafite); font-weight: 700; transition: background var(--t); }
+.selo-conta:hover { background: #4BE08F; }
+.selo-inicio { font-weight: 600; color: var(--off); }
+.selo-inicio:hover { color: var(--verde); }
+.selo-demo .selo-mais, .selo-modo { display: none; }
+body:has(.selo-demo) { padding-bottom: 52px; }
+body:not(:has(.barra)) .selo-demo { bottom: 0; }
+@media (min-width: 960px) {
+  .selo-demo { left: auto; right: 20px; bottom: 20px; gap: 16px; padding: 10px 10px 10px 16px; border: 1px solid rgba(245, 165, 36, .45); border-radius: 999px; box-shadow: 0 12px 40px rgba(0, 0, 0, .45); }
+  .selo-demo .selo-mais, .selo-modo { display: inline; }
+  .selo-demo .selo-curto { display: none; }
+  .selo-demo .selo-txt .selo-mais { display: none; }
+  body:has(.selo-demo) { padding-bottom: 0; }
+  /* telas com menu lateral: cartão no menu, acima do perfil, sem cobrir o conteúdo */
+  body:has(.lateral) .selo-demo { left: 16px; right: auto; bottom: 96px; width: calc(var(--lateral) - 32px); flex-direction: column; align-items: stretch; gap: 12px; padding: 14px; border-radius: var(--r); box-shadow: none; line-height: 1.45; }
+  body:has(.lateral) .selo-txt { flex-direction: column; align-items: flex-start; }
+  body:has(.lateral) .selo-txt .selo-mais { display: inline; font-size: 12.5px; }
+  body:has(.lateral) .selo-acoes { flex-direction: column; align-items: stretch; gap: 10px; }
+  body:has(.lateral) .selo-conta { justify-content: center; height: 38px; }
+  body:has(.lateral) .selo-inicio { text-align: center; font-size: 13px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }

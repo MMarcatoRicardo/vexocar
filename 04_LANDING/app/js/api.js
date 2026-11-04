@@ -39,7 +39,33 @@
   var API = local ? location.origin : API_PUBLICADA;
   var pagina = location.pathname.split('/').pop() || 'index.html';
 
-  if (!ativo) { window.VXAPI = { ativo: false }; return; }
+  if (!ativo) {
+    // demo: true = demonstração aberta pelo site (botão "Ver demonstração"), não pelos arquivos do computador
+    window.VXAPI = { ativo: false, demo: porServidor };
+    if (porServidor) seloDemo();
+    return;
+  }
+
+  /* Selo da demonstração pelo site: avisa que é a conta de exemplo e tem duas saídas:
+     "Criar minha conta" (?modo=api, o modo fica guardado no navegador) e "Voltar ao início" (a landing desliga a demo). */
+  function seloDemo() {
+    if (pagina === 'demo.html') return;
+    function por() {
+      var s = document.createElement('div');
+      s.className = 'selo-demo';
+      s.setAttribute('role', 'status');
+      s.innerHTML =
+        '<div class="selo-txt"><span class="selo-tag"><span class="selo-modo">Modo </span>demonstração</span>' +
+          '<span class="selo-mais">Você está vendo uma conta de exemplo. Nada aqui é salvo de verdade.</span>' +
+          '</div>' +
+        '<div class="selo-acoes">' +
+          '<a class="selo-conta" href="criar-conta.html?modo=api"><span class="selo-mais">Criar minha conta</span><span class="selo-curto">Criar conta</span></a>' +
+          '<a class="selo-inicio" href="../index.html"><span class="selo-mais">← Voltar ao início</span><span class="selo-curto">Início</span></a>' +
+        '</div>';
+      document.body.appendChild(s);
+    }
+    if (document.body) por(); else document.addEventListener('DOMContentLoaded', por);
+  }
 
   // No modo API, "hoje" é a data de verdade (na demonstração ela fica fixa em 03/11/2026)
   var agora = new Date();
