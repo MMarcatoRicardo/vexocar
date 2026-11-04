@@ -14,6 +14,9 @@ Segmento: **4. Hub Digital de Manutenção e Histórico Veicular**.
 | Demonstração (sem criar conta, 3 carros de exemplo) | https://mmarcatoricardo.github.io/vexocar/app/demo.html |
 | API | https://vexocar.onrender.com/api/saude |
 
+QR code do site: [`02_MARCA/qrcode-site.png`](02_MARCA/qrcode-site.png) (simples) e [`02_MARCA/qrcode-site-marca.png`](02_MARCA/qrcode-site-marca.png) (com a marca).
+No celular, o site pode ser instalado como app: botão **Instalar app** na página inicial ou no Perfil.
+
 > A API roda no plano grátis do Render, que "dorme" depois de 15 minutos parado. O primeiro acesso pode levar
 > cerca de 1 minuto para acordar.
 
