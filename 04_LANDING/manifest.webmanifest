@@ -1,0 +1,23 @@
+{
+  "name": "VEXOcar · prontuário digital do seu carro",
+  "short_name": "VEXOcar",
+  "description": "Histórico de manutenção, alertas de revisão, IPVA e licenciamento, e vitrine com histórico comprovado.",
+  "id": "./",
+  "start_url": "./app/garagem",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E0F11",
+  "theme_color": "#0E0F11",
+  "lang": "pt-BR",
+  "categories": ["auto", "productivity", "utilities"],
+  "icons": [
+    { "src": "img/app/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "img/app/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "img/app/icone-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Nova manutenção", "url": "./app/nova-manutencao", "icons": [{ "src": "img/app/icone-192.png", "sizes": "192x192" }] },
+    { "name": "Alertas", "url": "./app/alertas", "icons": [{ "src": "img/app/icone-192.png", "sizes": "192x192" }] }
+  ]
+}
