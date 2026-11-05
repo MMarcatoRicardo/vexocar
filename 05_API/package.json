@@ -5,8 +5,7 @@
   "main": "src/servidor.js",
   "scripts": {
     "start": "node src/servidor.js",
-    "dev": "node --watch src/servidor.js",
-    "teste": "node teste/teste-api.js"
+    "dev": "node --watch src/servidor.js"
   },
   "engines": {
     "node": ">=20.12"

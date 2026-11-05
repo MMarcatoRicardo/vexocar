@@ -25,3 +25,8 @@ Enunciado*.docx
 Thumbs.db
 .env.*
 !.env.exemplo
+
+# Relatório final e roteiro do pitch (têm RGM; ficam só no computador)
+07_RELATORIO/
+# Respostas do Forms (têm WhatsApp de quem respondeu)
+01_PESQUISA/respostas*.csv
