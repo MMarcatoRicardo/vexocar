@@ -38,7 +38,7 @@ pessoa trocar de tela, nada se perde: a fila continua na próxima tela. Fotos so
 | PATCH | `/api/usuario` | sim | Nome, e-mail, perfil, notificações, favoritos, alertas lidos |
 | PUT / DELETE | `/api/:colecao/:id` | sim | Cria, altera ou apaga: `carros`, `manutencoes`, `pagamentos`, `meusAnuncios`, `transferidos`, `avaliacoes` |
 | POST | `/api/fotos` | sim | Recebe a foto (base64) e devolve o endereço |
-| POST | `/api/exemplo` | sim | Troca os carros da conta pelo Polo e o CR-V de exemplo |
+| POST | `/api/exemplo` | sim | Troca os carros da conta pelos 3 carros de exemplo (Polo, CR-V e Camry) |
 | GET | `/api/publico/carros/:id` | não | Histórico do QR code: sem valores em R$, placa mascarada, sem foto da nota |
 
 Segurança: todo documento leva o `uid` do dono e a API só deixa o dono ler e alterar; cada coleção tem validação

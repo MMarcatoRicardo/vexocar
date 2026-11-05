@@ -22,11 +22,11 @@ No celular, o site pode ser instalado como app: botão **Instalar app** na pági
 
 ## Equipe
 
-| Integrante | Curso |
-|---|---|
-| Ricardo Medeiros Marcato | Engenharia de Software |
-| Daniel Ribeiro da Costa | Engenharia de Software |
-| Lucas Markovicz Costa | Sistemas de Informação |
+| Integrante | Curso | Função |
+|---|---|---|
+| Ricardo Medeiros Marcato | Engenharia de Software | Tech Lead e Marca: arquitetura, banco, deploy e integração |
+| Daniel Ribeiro da Costa | Engenharia de Software | UX/UI e Protótipo: telas e front-end |
+| Lucas Markovicz Costa | Sistemas de Informação | Pesquisa e Produto (PO): API e relatório |
 
 ## O que tem no repositório
 
@@ -35,9 +35,10 @@ No celular, o site pode ser instalado como app: botão **Instalar app** na pági
 | `01_PESQUISA/` | Script do Google Forms da pesquisa com o público (motoristas de app e donos de carro) |
 | `02_MARCA/` | Logo "V de pista", ícone, guia da marca (Audiowide + Inter, grafite + verde-pista) |
 | `03_WIREFRAMES/` | Gerador dos wireframes e plugin do Figma que liga o protótipo |
-| `04_LANDING/` | **O front-end:** landing page (`index.html`) e o app com 18 telas (`app/`) |
+| `04_LANDING/` | **O front-end:** landing page (`index.html`) e o app com 19 telas e a porta da demonstração (`app/`) |
 | `05_API/` | **O back-end:** API REST em Node.js + Express ([README próprio](05_API/README.md)) |
 | `06_ALTA_FIDELIDADE/` | Gerador das telas de alta fidelidade enviadas ao Figma |
+| `docs/` | **Documentação técnica** (veja abaixo) |
 
 ## Tecnologias
 
@@ -46,6 +47,46 @@ No celular, o site pode ser instalado como app: botão **Instalar app** na pági
 - **Banco e login:** Firebase (Firestore + Authentication com e-mail/senha e Google).
 - **Fotos:** Cloudinary (carros, notas fiscais, anúncios).
 - **Design:** Figma (marca, wireframes e alta fidelidade).
+
+## Arquitetura
+
+O front-end é HTML, CSS e JavaScript puros, sem framework, publicado no GitHub Pages. O back-end é uma API REST em
+Node.js + Express 5, no Render, que guarda os dados no Firestore, confere o login do Firebase Auth e manda as fotos
+para o Cloudinary. As telas só chamam `VX.db()` e `VX.salvar(d)`; o arquivo `app/js/api.js` descobre o que mudou e
+manda para a API por uma fila guardada no navegador. Sem servidor (`file://`) ou com `?modo=demo`, o app roda em
+modo demonstração, com os dados no próprio navegador.
+
+```mermaid
+flowchart LR
+  subgraph NAV["Navegador"]
+    T["Telas HTML"] --> APP["app.js<br/>VX.db() e VX.salvar()"]
+    APP --> AJS["api.js<br/>cache + fila"]
+    APP -.->|modo demonstração| LS[("localStorage")]
+  end
+  GH["GitHub Pages<br/>04_LANDING"] --> T
+  AJS -->|"HTTPS + token"| API["API Express 5<br/>05_API no Render"]
+  AJS -->|login| FA["Firebase Auth"]
+  API -->|confere o token| FA
+  API --> FS[("Firestore")]
+  API --> CL["Cloudinary"]
+```
+
+Detalhes em [docs/ARQUITETURA.md](docs/ARQUITETURA.md).
+
+## Documentação
+
+| Documento | O que tem |
+|---|---|
+| [Índice da documentação](docs/README.md) | Lista de todos os documentos |
+| [Visão geral](docs/VISAO-GERAL.md) | Problema, público, proposta de valor, escopo por nível e o que ficou fora |
+| [Funcionalidades](docs/FUNCIONALIDADES.md) | Cada tela e as regras: alertas, nota de saúde, gastos, vitrine, FIPE, transferência, avaliações |
+| [Arquitetura](docs/ARQUITETURA.md) | Front ↔ API ↔ Firebase/Cloudinary, modos, pastas e segurança |
+| [API](docs/API.md) | Todas as rotas, com corpo e resposta |
+| [Modelo de dados](docs/MODELO-DE-DADOS.md) | Coleções, campos e diagrama |
+| [Guia de execução](docs/GUIA-DE-EXECUCAO.md) | Rodar no computador e resolver problemas comuns |
+| [Deploy](docs/DEPLOY.md) | GitHub Pages, Render, Firebase e como publicar mudanças |
+| [Design](docs/DESIGN.md) | Marca, princípios, wireframes, alta fidelidade e acessibilidade |
+| [Pesquisa](docs/PESQUISA.md) | Como funciona a pesquisa e a lista de perguntas |
 
 ## Rodar no computador
 
@@ -61,6 +102,8 @@ nenhuma conta. Para usar Firebase e Cloudinary, copie `05_API/.env.exemplo` para
 
 Também dá para abrir `04_LANDING/index.html` direto no navegador: o app entra em **modo demonstração**, com dados
 de exemplo guardados no próprio navegador.
+
+Passo a passo completo e solução de problemas: [docs/GUIA-DE-EXECUCAO.md](docs/GUIA-DE-EXECUCAO.md).
 
 ## Licença
 
