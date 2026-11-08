@@ -4,6 +4,12 @@
 IPVA e licenciamento, painel de gastos, oficinas próximas com avaliações e uma vitrine onde o carro é vendido junto com
 o histórico (e transferido para a conta do comprador).
 
+[![Demo online](https://img.shields.io/badge/demo-online-2FD47A?style=for-the-badge)](https://mmarcatoricardo.github.io/vexocar/app/demo.html)
+[![Site](https://img.shields.io/badge/site-GitHub%20Pages-0E0F11?style=for-the-badge)](https://mmarcatoricardo.github.io/vexocar/)
+[![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-F2F1EC?style=for-the-badge)](LICENSE)
+
+![Tour pelo VEXOcar: página inicial, garagem, ficha do carro, alertas, gastos, oficinas e vitrine](docs/img/vexocar-tour.gif)
+
 Projeto Integrador de **Design Profissional** (Prof. Sedenilso Machado), Universidade Positivo, 2026.
 Segmento: **4. Hub Digital de Manutenção e Histórico Veicular**.
 
@@ -16,6 +22,8 @@ Segmento: **4. Hub Digital de Manutenção e Histórico Veicular**.
 
 QR code do site: [`02_MARCA/qrcode-site.png`](02_MARCA/qrcode-site.png) (simples) e [`02_MARCA/qrcode-site-marca.png`](02_MARCA/qrcode-site-marca.png) (com a marca).
 No celular, o site pode ser instalado como app: botão **Instalar app** na página inicial ou no Perfil.
+
+E se você errar o endereço, a [página 404](https://mmarcatoricardo.github.io/vexocar/qualquer-coisa) vira um joguinho: desvie dos cones trocando de faixa com as setas.
 
 > A API roda no plano grátis do Render, que "dorme" depois de 15 minutos parado. O primeiro acesso pode levar
 > cerca de 1 minuto para acordar.
