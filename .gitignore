@@ -30,3 +30,10 @@ Thumbs.db
 07_RELATORIO/
 # Respostas do Forms (têm WhatsApp de quem respondeu)
 01_PESQUISA/respostas*.csv
+01_PESQUISA/*.xlsx
+
+# Arquivos de assistente de código (ficam só no computador)
+CLAUDE.md
+.claude/
+.agents/
+AGENTS.md
