@@ -3,7 +3,7 @@
 Documentação técnica do VEXOcar, o prontuário digital do seu carro.
 Projeto Integrador de Design Profissional, Universidade Positivo, 2026.
 
-Comece pela visão geral. Se você só quer rodar o projeto, vá direto ao guia de execução.
+Comece pela visão geral. Se você só quer rodar o projeto, vá direto ao guia de execução.   
 
 | Arquivo | O que tem |
 |---|---|
