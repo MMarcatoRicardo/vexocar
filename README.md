@@ -1,6 +1,14 @@
 # VEXOcar
 
-  
+| | |
+|---|---|
+| **Instituição** | Universidade Positivo |
+| **Cursos** | Engenharia de Software e Sistemas de Informação |
+| **Período** | 2º período |
+| **Ano** | 2026 |
+| **Disciplina** | Design Profissional (Projeto Integrador) |
+| **Professor** | Sedenilso Machado |
+
 **O prontuário digital do seu carro.** Histórico de manutenção comprovado por nota fiscal, alertas de revisão, óleo,
 IPVA e licenciamento, painel de gastos, oficinas próximas com avaliações e uma vitrine onde o carro é vendido junto com
 o histórico (e transferido para a conta do comprador).
@@ -11,7 +19,6 @@ o histórico (e transferido para a conta do comprador).
 
 ![Tour pelo VEXOcar: página inicial, garagem, ficha do carro, alertas, gastos, oficinas e vitrine](docs/img/vexocar-tour.gif)
 
-Projeto Integrador de **Design Profissional** (Prof. Sedenilso Machado), Universidade Positivo, 2026.
 Segmento: **4. Hub Digital de Manutenção e Histórico Veicular**.
 
 | | |
