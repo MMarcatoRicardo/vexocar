@@ -376,22 +376,40 @@
       var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = erro; document.head.appendChild(s);
     });
   }
+  /* O pop-up do Google precisa abrir no mesmo clique. Se o SDK for baixado depois do clique, o navegador
+     bloqueia a janela ("Unable to establish a connection with the popup"). Por isso a tela de login já
+     deixa o Firebase pronto ao abrir (prepararGoogle) e o clique só abre o pop-up. */
+  var googlePronto = null;
+  function prepararGoogle() {
+    if (!googlePronto) {
+      googlePronto = config().then(function (c) {
+        if (c.login !== 'firebase') return c;
+        var v = 'https://www.gstatic.com/firebasejs/10.12.2/';
+        return carregarScript(v + 'firebase-app-compat.js').then(function () { return carregarScript(v + 'firebase-auth-compat.js'); }).then(function () {
+          if (!firebase.apps.length) firebase.initializeApp(c.firebase);
+          return c;
+        });
+      });
+      googlePronto.catch(function () { googlePronto = null; });
+    }
+    return googlePronto;
+  }
+  function popupGoogle() { return firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
   function google() {
     limparTudo();
-    return config().then(function (c) {
+    var pronto = window.firebase && firebase.apps && firebase.apps.length;
+    var p = pronto ? popupGoogle() : prepararGoogle().then(function (c) {
       if (c.login !== 'firebase') throw new Error('Entrar com Google precisa do Firebase ligado na API. Use e-mail e senha.');
-      var v = 'https://www.gstatic.com/firebasejs/10.12.2/';
-      return carregarScript(v + 'firebase-app-compat.js').then(function () { return carregarScript(v + 'firebase-auth-compat.js'); }).then(function () {
-        if (!firebase.apps.length) firebase.initializeApp(c.firebase);
-        return firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
-      });
-    }).then(function (res) {
+      return popupGoogle();
+    });
+    return p.then(function (res) {
       var u = res.user;
       return u.getIdToken().then(function (t) {
         gravar(K.sessao, { modo: 'firebase', token: t, refresh: u.refreshToken, exp: Date.now() + 3300000, uid: u.uid, email: u.email });
       });
     }).then(carregarEstado).catch(function (e) {
-      if (e && e.code === 'auth/popup-closed-by-user') throw new Error('Login com Google cancelado.');
+      if (e && (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request')) throw new Error('Login com Google cancelado.');
+      if (e && e.code === 'auth/popup-blocked') throw new Error('O navegador bloqueou a janela do Google. Clique de novo em "Entrar com Google" ou libere pop-ups para este site.');
       if (e && e.code === 'auth/unauthorized-domain') throw new Error('Este endereço não está liberado no Firebase (Authentication > Settings > Authorized domains).');
       return semServidor(e);
     });
@@ -441,7 +459,7 @@
   window.VXAPI = {
     ativo: true, endereco: API,
     db: db, salvar: salvar, enviar: enviar, carregarEstado: carregarEstado, pendentes: function () { return fila().length; },
-    entrar: entrar, criarConta: criarConta, google: google, esqueciSenha: esqueciSenha, sair: sair,
+    entrar: entrar, criarConta: criarConta, google: google, prepararGoogle: prepararGoogle, esqueciSenha: esqueciSenha, sair: sair,
     restaurarExemplo: restaurarExemplo, publico: publico, transferir: transferir, visita: visita, sessao: sessao
   };
 })();
