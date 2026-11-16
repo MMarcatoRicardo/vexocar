@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/app.css?v=20261104b">
+<link rel="stylesheet" href="css/app.css?v=20261116a">
 <style>
   .esqueci { align-self: flex-end; font-size: 13px; margin-top: -8px; }
   .demo { margin-top: 16px; }
@@ -63,9 +63,9 @@
   </main>
 </div>
 
-<script src="js/dados.js?v=20261104b"></script>
-<script src="js/api.js?v=20261104b"></script>
-<script src="js/app.js?v=20261104b"></script>
+<script src="js/dados.js?v=20261116a"></script>
+<script src="js/api.js?v=20261116a"></script>
+<script src="js/app.js?v=20261116a"></script>
 <script>
   VX.simbolo();
   document.getElementById('google').innerHTML = VX.iconeGoogle() + 'Entrar com Google';
@@ -126,6 +126,8 @@
     document.getElementById(id).addEventListener('input', function () { marcaErro(id, ''); });
   });
   document.getElementById('google').addEventListener('click', function () { entrar('', '', true); });
+  // Deixa o Firebase pronto já ao abrir a tela: o pop-up do Google precisa abrir no mesmo clique.
+  if (VXAPI.ativo && VXAPI.prepararGoogle) VXAPI.prepararGoogle().catch(function () {});
 </script>
 <script>
   // leva o destino junto se a pessoa preferir criar conta

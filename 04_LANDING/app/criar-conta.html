@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/app.css?v=20261104b">
+<link rel="stylesheet" href="css/app.css?v=20261116a">
 <style>
   .forca { display: flex; gap: 4px; margin-top: 2px; }
   .forca i { flex: 1; height: 4px; border-radius: 2px; background: var(--linha); transition: background var(--t); }
@@ -72,9 +72,9 @@
   </main>
 </div>
 
-<script src="js/dados.js?v=20261104b"></script>
-<script src="js/api.js?v=20261104b"></script>
-<script src="js/app.js?v=20261104b"></script>
+<script src="js/dados.js?v=20261116a"></script>
+<script src="js/api.js?v=20261116a"></script>
+<script src="js/app.js?v=20261116a"></script>
 <script>
   VX.simbolo();
   document.getElementById('google').innerHTML = VX.iconeGoogle() + 'Criar com Google';
@@ -160,6 +160,8 @@
   });
   document.getElementById('termos').addEventListener('change', function () { document.getElementById('termos-l').classList.remove('erro'); });
   document.getElementById('google').addEventListener('click', function () { criar('Novo usuário', 'voce@gmail.com', '', true); });
+  // Deixa o Firebase pronto já ao abrir a tela: o pop-up do Google precisa abrir no mesmo clique.
+  if (VXAPI.ativo && VXAPI.prepararGoogle) VXAPI.prepararGoogle().catch(function () {});
 </script>
 </body>
 </html>
